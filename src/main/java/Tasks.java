@@ -1,19 +1,19 @@
 import java.util.Date;
 
 public class Tasks {
-    private Date date;
+    private Date dueDate;
     private String title;
     private String description;
-    private boolean state = false; //false if the task is undone
+    private boolean isCompleted;
 
-    public Tasks(Date date, String title, String description,boolean state) {
-        this.date = date;
+    public Tasks(Date dueDate, String title, String description, boolean isCompleted) {
+        this.dueDate = dueDate;
         this.title = title;
         this.description = description;
-        this.state = state;
+        this.isCompleted = false;
     }
-    public Date getDate(){
-        return date;
+    public Date getDueDate(){
+        return dueDate;
     }
     public String getTitle(){
         return title;
@@ -22,7 +22,7 @@ public class Tasks {
         return description;
     }
     public void setData(Date date){
-        this.date = date;
+        this.dueDate = date;
     }
     public void setTitle(String title){
         this.title = title;
@@ -30,10 +30,11 @@ public class Tasks {
     public void setDescription(String description){
         this.description = description;
     }
-    public boolean getState(){
-        return state;
+    public boolean getCompleted(){
+        return isCompleted;
     }
-    public void setState(boolean state){
-        this.state = state;
+    public void setCompleted(boolean completed){
+        this.isCompleted = completed;
     }
+    //TODO REOCURRING TASKS
 }
