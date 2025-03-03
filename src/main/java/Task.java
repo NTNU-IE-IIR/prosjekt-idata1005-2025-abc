@@ -1,12 +1,12 @@
 import java.util.Date;
 
-public class Tasks {
+public class Task {
     private Date dueDate;
     private String title;
     private String description;
     private boolean isCompleted;
 
-    public Tasks(Date dueDate, String title, String description, boolean isCompleted) {
+    public Task(Date dueDate, String title, String description, boolean isCompleted) {
         this.dueDate = dueDate;
         this.title = title;
         this.description = description;

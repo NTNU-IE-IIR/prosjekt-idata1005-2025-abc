@@ -14,7 +14,7 @@ public class DataHandler {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(dataFile));
             bufferedWriter.write(user.getUsername());
-//            bufferedWriter.write(user.getPassword());
+            bufferedWriter.write(user.getPassword());
             bufferedWriter.close();
         }catch (IOException e){
             System.err.println(e.getMessage());
