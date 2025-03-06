@@ -7,13 +7,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize your login page
+
         LoginPage loginPage = new LoginPage();
 
-        // Create a scene for the login UI
+
         Scene loginScene = new Scene(loginPage.getRoot(), 400, 300);
 
-        // Set up the primary stage
+
         primaryStage.setTitle("Login Page");
         primaryStage.setScene(loginScene);
         primaryStage.show();
