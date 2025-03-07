@@ -1,4 +1,4 @@
-package Gui;
+package gui;
 
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
@@ -27,7 +27,7 @@ public class LoginPage {
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
         root.getStyleClass().add("login-container");
-        URL cssURL = getClass().getResource("/Gui/loginpage.css");
+        URL cssURL = getClass().getResource("/gui/loginpage.css");
         if (cssURL == null) {
             System.err.println("loginpage.css not found!");
         } else {

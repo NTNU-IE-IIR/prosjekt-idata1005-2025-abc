@@ -1,0 +1,194 @@
+package dbcontext;
+
+import utils.Logger;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHelper {
+  private final String url;
+  private final String user;
+  private final String password;
+
+  public DatabaseHelper(String url, String user, String password) {
+    this.url = url;
+    this.user = user;
+    this.password = password;
+  }
+  /**
+   * Executes a SELECT query and maps the result to a list of DTO objects.
+   *
+   * @param <T>       The DTO type.
+   * @param query     The SQL SELECT query.
+   * @param baseClass The DTO class to map results to.
+   * @param params    The parameters for the query (if any).
+   * @return A list of mapped objects.
+   */
+  public <T> List<T> executeSelect(String query, Class<T> baseClass, Object... params) throws SQLException{
+    List<T> resultList = new ArrayList<>();
+    try (Connection conn = DriverManager.getConnection(url, user, password);
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+      setParameters(stmt, params);
+      ResultSet rs = stmt.executeQuery();
+
+      // Handle one column selects
+      if(isSimpleType(baseClass)) {
+        while (rs.next()) {
+          resultList.add(rs.getObject(1, baseClass));
+        }
+        return resultList;
+      }
+
+      // Map to DTOs
+      return mapToList(rs, baseClass);
+
+    } catch (Exception e) {
+      throw new SQLException("Error executing SELECT query", e);
+    }
+  }
+
+  /**
+   * Executes an INSERT, UPDATE, or DELETE statement.
+   *
+   * @param query  The SQL query to execute.
+   * @param params The parameters for the query.
+   * @return The number of affected rows.
+   */
+  public int executeUpdate(String query, Object... params) throws SQLException{
+    try (Connection conn = DriverManager.getConnection(url, user, password);
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+      setParameters(stmt, params);
+      return stmt.executeUpdate();
+
+    } catch (SQLException e) {
+      throw new SQLException("Error executing query", e);
+    }
+  }
+
+  /**
+   * Sets parameters for a {@link PreparedStatement}.
+   *
+   * @param stmt   The statement to set parameters for.
+   * @param params The parameters to bind.
+   * @throws SQLException If an error occurs.
+   */
+  private static void setParameters(PreparedStatement stmt, Object... params) throws SQLException {
+    for (int i = 0; i < params.length; i++) {
+      stmt.setObject(i + 1, params[i]);
+    }
+  }
+
+  /**
+   * Maps a {@link ResultSet} to a list of objects of type {@code T}.
+   * <p>
+   * This method dynamically assigns column values to fields in the given DTO class.
+   * If a field is a nested object (foreign key reference), it attempts to map the
+   * corresponding values as well.
+   * The field names in the DTO objects must be the same as in the SQL table.
+   * Furthermore to nest objects I.E nest {@code User} object under {@code Task} object you need to follow the following convention:
+   * "{@code Object / Table}_{@code Field / column }" when setting a prefix in the SQL query.
+   * </p>
+   *
+   * @param <T>       The type of DTO object.
+   * @param rs        The {@link ResultSet} containing database results.
+   * @param baseClass The DTO class to map the results to.
+   * @return A list of objects of type {@code T} populated with ResultSet data.
+   * @throws SQLException If an error occurs while accessing the ResultSet.
+   */
+  public <T> List<T> mapToList(ResultSet rs, Class<T> baseClass) throws SQLException {
+    List<T> resultList = new ArrayList<>();
+    try {
+      Field[] fields = baseClass.getDeclaredFields();
+      Constructor<T> constructor = baseClass.getDeclaredConstructor(); // Default constructor
+
+      while (rs.next()) {
+        T instance = constructor.newInstance(); // Create a new DTO instance
+
+        for (Field field : fields) {
+          field.setAccessible(true);
+          String columnName = field.getName(); // Assume column name matches DTO field name
+
+          // Handle simple data types
+          if (isSimpleType(field.getType())) {
+            try {
+              Object value = rs.getObject(columnName);
+              if (value != null) {
+                field.set(instance, value);
+              }
+            } catch (SQLException ignored) { /* Ignore missing columns */ }
+          }
+          // Handle nested DTOs (Foreign Keys)
+          else {
+            Object nestedObject = mapNestedDTO(rs, field.getType(), columnName);
+            if (nestedObject != null) {
+              field.set(instance, nestedObject);
+            }
+          }
+        }
+        resultList.add(instance);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Error mapping ResultSet to " + baseClass.getName(), e);
+    }
+    return resultList;
+  }
+
+  /**
+   * Maps nested DTOs by matching column names formatted as 'prefix_fieldName'.
+   * <p>
+   * Example: If mapping a {@code HouseholdDTO} object, columns should be named
+   * like {@code household_id}, {@code household_name}, etc.
+   * </p>
+   *
+   * @param <T>        The type of the nested DTO.
+   * @param rs         The {@link ResultSet} containing data.
+   * @param nestedClass The nested DTO class.
+   * @param prefix     The expected prefix for columns (e.g., "household").
+   * @return A nested DTO object populated with corresponding fields, or {@code null} if no data is found.
+   */
+  private <T> T mapNestedDTO(ResultSet rs, Class<T> nestedClass, String prefix) {
+    try {
+      Constructor<T> constructor = nestedClass.getDeclaredConstructor();
+      T instance = constructor.newInstance();
+      Field[] fields = nestedClass.getDeclaredFields();
+      boolean hasData = false; // Track if any field is set
+
+      for (Field field : fields) {
+        field.setAccessible(true);
+        String columnName = prefix + "_" + field.getName(); // Expect SQL alias: household_id, household_name
+
+        try {
+          Object value = rs.getObject(columnName);
+          if (value != null) {
+            field.set(instance, value);
+            hasData = true;
+          }
+        } catch (SQLException ignored) { /* Ignore missing columns */ }
+      }
+
+      return hasData ? instance : null; // Return null only if no fields were set
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  /**
+   * Checks if a type is a simple Java type (primitive, String, or wrapper class).
+   *
+   * @param type The class type to check.
+   * @return {@code true} if the type is a primitive or a standard wrapper class, {@code false} otherwise.
+   */
+  private boolean isSimpleType(Class<?> type) {
+    return type.isPrimitive() ||
+      type.equals(String.class) ||
+      type.equals(Integer.class) || type.equals(Long.class) ||
+      type.equals(Double.class) || type.equals(Float.class) ||
+      type.equals(Boolean.class) || type.equals(Byte.class) ||
+      type.equals(Character.class) || type.equals(Short.class);
+  }
+}
