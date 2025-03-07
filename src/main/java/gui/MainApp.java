@@ -61,23 +61,56 @@ public class MainApp {
         TextField searchField = new TextField();
         searchField.setPromptText("Search tasks...");
 
+        // Create the left bar
+        HBox rightBar = new HBox(15);
+        rightBar.setPadding(new Insets(10));
+        topBar.setAlignment(Pos.CENTER_LEFT);
+
+        Button addUserBtn = new Button("Add people");
+
+        rightBar.getChildren().addAll(addUserBtn);
         // Adds all the components to the top bar
         topBar.getChildren().addAll(addTaskBtn, distributeBtn, closeDoneBtn, searchField);
 
         // Creates a table for the tasks, and it's accompanying columns
         taskTable = new TableView<>();
         taskTable.getStyleClass().add("task-table");
-        TableColumn<TaskDTO, String> taskNameCol = new TableColumn<>("Task");
-        TableColumn<TaskDTO, String> priorityCol = new TableColumn<>("Priority");
-        TableColumn<TaskDTO, String> statusCol = new TableColumn<>("Status");
-        TableColumn<TaskDTO, String> descCol = new TableColumn<>("Description");
+        // Define Table Columns
+        TableColumn<TaskDTO, String> descriptionColumn = new TableColumn<>("Description");
+        descriptionColumn.setCellValueFactory(cellData ->
+          new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescription()));
 
-        // Adds the columns to the table
-        taskTable.getColumns().addAll(taskNameCol, priorityCol, statusCol, descCol);
+        TableColumn<TaskDTO, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setCellValueFactory(cellData ->
+          new javafx.beans.property.SimpleStringProperty(
+            cellData.getValue().getStatus() != null ? cellData.getValue().getStatus().getName() : "N/A"
+          )
+        );
+
+        TableColumn<TaskDTO, String> priorityColumn = new TableColumn<>("Priority");
+        priorityColumn.setCellValueFactory(cellData ->
+          new javafx.beans.property.SimpleStringProperty(
+            cellData.getValue().getPriority() != null ? cellData.getValue().getPriority().getName() : "N/A"
+          )
+        );
+
+        TableColumn<TaskDTO, String> userColumn = new TableColumn<>("User");
+        userColumn.setCellValueFactory(cellData ->
+          new javafx.beans.property.SimpleStringProperty(
+            cellData.getValue().getUser() != null ? cellData.getValue().getUser().getName() : "N/A"
+          )
+        );
+
+        // Add columns to the table
+        taskTable.getColumns().addAll(descriptionColumn, statusColumn, priorityColumn, userColumn);
+
+        // Populate with test data
+        taskTable.setItems(getTasks());
 
         // Sets the top-bar at the top
         root.setTop(topBar);
 
+        root.setRight(rightBar);
         // Sets the task-table in the center
         root.setCenter(taskTable);
 
@@ -100,6 +133,12 @@ public class MainApp {
 
             Logger.info("Search tasks for: " + searchText);
         });
+    }
+
+    private ObservableList<TaskDTO> getTasks() {
+        ObservableList<TaskDTO> tasks = FXCollections.observableArrayList();
+        tasks.addAll(dataHandler.getAllTasks(household.getId()));
+        return tasks;
     }
 
     private void addTask(){

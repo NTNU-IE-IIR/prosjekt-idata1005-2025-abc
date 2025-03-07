@@ -86,7 +86,8 @@ public class DataHandler {
         return users;
     }
 
-    public void getTasks(){
+    public List<TaskDTO> getAllTasks(int householdId){
+        List<TaskDTO> tasks = new ArrayList<>();
         String query = "SELECT " +
           "t.id, t.description, " +
           "h.id AS household_id, h.name AS household_name, " +
@@ -94,15 +95,17 @@ public class DataHandler {
           "p.id AS priority_id, p.name AS priority_name, " +
           "u.id AS user_id, u.name AS user_name " +
           "FROM tasks t " +
-          "JOIN households h ON t.householdId = h.id " +
-          "JOIN status s ON t.statusId = s.id " +
-          "JOIN priorities p ON t.priorityId = p.id " +
-          "JOIN users u ON t.ownerId = u.id";
+          "LEFT JOIN households h ON t.householdId = h.id " +
+          "LEFT JOIN status s ON t.statusId = s.id " +
+          "LEFT JOIN priorities p ON t.priorityId = p.id " +
+          "LEFT JOIN users u ON t.ownerId = u.id " +
+          "WHERE t.householdId = ?";
         try{
-            List<TaskDTO> result = dbHelper.executeSelect(query, TaskDTO.class);
+            tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId);
         } catch ( SQLException e){
             Logger.error("Error fetching tasks: " + e.getMessage());
         }
+        return tasks;
     }
 
 }

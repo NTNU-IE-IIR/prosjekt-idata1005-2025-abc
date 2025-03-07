@@ -1,6 +1,7 @@
 package gui;
 
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -59,10 +60,12 @@ public class LoginPage {
 
     private static void loginSuccess(ActionEvent event) {
         MainApp mainApp = new MainApp();
-        Scene mainScene = new Scene(mainApp.getRoot(), 800, 600);
+        Scene mainScene = new Scene(mainApp.getRoot(), 1200, 800);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(mainScene);
         stage.setTitle("Main Application");
+
+        Platform.runLater(stage::centerOnScreen);
     }
 
     public void loginFailed(ActionEvent event) {

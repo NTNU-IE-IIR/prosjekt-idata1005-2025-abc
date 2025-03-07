@@ -40,6 +40,18 @@ public class TaskDTO {
     return description;
   }
 
+  public StatusDTO getStatus(){
+    return status;
+  }
+
+  public PriorityDTO getPriority(){
+    return priority;
+  }
+
+  public UserDTO getUser(){
+    return user;
+  }
+
   public Integer getStatusId(){
     if(status != null)
       return status.getId();
