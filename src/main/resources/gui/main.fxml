@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="controllers.MainController">
+
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="top-bar">
+            <Button fx:id="addTaskBtn" text="Add new task" />
+            <Button fx:id="distributeBtn" text="Distribute all tasks" />
+            <Button fx:id="closeDoneBtn" text="Close done tasks" />
+            <TextField fx:id="searchField" promptText="Search tasks..." />
+        </HBox>
+    </top>
+
+    <!-- Right Bar -->
+    <right>
+        <HBox alignment="TOP_CENTER" spacing="15">
+            <Button fx:id="addUserBtn" text="Add people" />
+        </HBox>
+    </right>
+
+    <!-- Table (Center) -->
+    <center>
+        <TableView fx:id="taskTable" styleClass="task-table">
+            <columns>
+                <TableColumn fx:id="descriptionColumn" text="Description" />
+                <TableColumn fx:id="statusColumn" text="Status" />
+                <TableColumn fx:id="priorityColumn" text="Priority" />
+                <TableColumn fx:id="userColumn" text="User" />
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Button fx:id="previousTaskPage" text="Previous page" />
+            <Button fx:id="nextTaskPage" text="Next page" />
+        </HBox>
+    </bottom>
+</BorderPane>
