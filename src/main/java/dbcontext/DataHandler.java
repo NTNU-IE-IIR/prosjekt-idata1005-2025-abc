@@ -170,4 +170,24 @@ public class DataHandler {
             Logger.error("Error adding user: " + e.getMessage());
         }
     }
+
+    public void updateTask(TaskDTO task) {
+        String query = "UPDATE tasks SET description = ?,statusId = ?, priorityId = ?, ownerId = ? WHERE id = ?";
+        try{
+            int rowsAffected = dbHelper.executeUpdate(
+                    query,
+                    task.getDescription(),
+                    task.getStatusId(),
+                    task.getPriorityId(),
+                    task.getUserId(),
+                    task.getId());
+                    if (rowsAffected > 0){
+                        Logger.info("Task updated successfully: " + task.getDescription());
+                    }else {
+                        Logger.error("Failed to update task: " + task.getDescription());
+                    }
+        }catch(SQLException e){
+            Logger.error("Error updating task : " + e.getMessage());
+        }
+    }
 }

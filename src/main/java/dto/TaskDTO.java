@@ -69,4 +69,7 @@ public class TaskDTO {
       return user.getId();
     return null;
   }
+  public void setStatus(StatusDTO status){
+    this.status = status;
+  }
 }
