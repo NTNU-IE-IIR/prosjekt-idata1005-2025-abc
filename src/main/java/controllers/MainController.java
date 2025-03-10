@@ -20,6 +20,7 @@ public class MainController {
 
   @FXML private BorderPane root;
   @FXML private TableView<TaskDTO> taskTable;
+  @FXML private ListView<UserDTO> userTable;
   @FXML private TableColumn<TaskDTO, String> descriptionColumn;
   @FXML private TableColumn<TaskDTO, String> statusColumn;
   @FXML private TableColumn<TaskDTO, String> priorityColumn;
@@ -75,6 +76,8 @@ public class MainController {
     // Load Data into Table
     taskTable.setItems(getAllTasks());
 
+    userTable.setItems(getAllUsers());
+
     // Attach Button Actions
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
@@ -89,6 +92,10 @@ public class MainController {
 
   private ObservableList<TaskDTO> getAllTasks() {
     return FXCollections.observableArrayList(dataHandler.getAllTasks(household.getId()));
+  }
+
+  private ObservableList<UserDTO> getAllUsers() {
+    return FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId()));
   }
   private void handleAddUser(ActionEvent event){
     Dialog<UserDTO> dialog = createBasicDialog("Add New User", "Enter user details");
@@ -126,6 +133,7 @@ public class MainController {
         result.ifPresent(user -> {
             dataHandler.addUser(user);
             initialUserList.add(user);
+            userTable.setItems(getAllUsers());
             Logger.info("User added successfully");
         });
   }
