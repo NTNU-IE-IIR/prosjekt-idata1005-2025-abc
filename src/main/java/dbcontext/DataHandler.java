@@ -2,10 +2,13 @@ package dbcontext;
 
 import dto.*;
 import utils.Logger;
+import utils.Message;
+import utils.MessageTypeEnum;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class DataHandler {
     private static final DatabaseHelper dbHelper;
@@ -26,6 +29,24 @@ public class DataHandler {
             Logger.error("Error fetching households: " + e.getMessage());
         }
         return households;
+    }
+
+    public Message<HouseholdDTO> getHousehold(String name, String hashedPassword) {
+        String query = "SELECT id, name FROM households WHERE name=? AND password=? LIMIT 1";
+        Message<HouseholdDTO> message;
+        try{
+             List<HouseholdDTO> queryResult = dbHelper.executeSelect(query, HouseholdDTO.class, name, hashedPassword);
+             if(queryResult.isEmpty()){
+                 message = new Message<>(MessageTypeEnum.ERROR,"Either password or name is wrong");
+             }
+             else{
+                 message = new Message<>(MessageTypeEnum.SUCCESS,"Success!", queryResult.getFirst());
+             }
+        }catch (SQLException e) {
+            message = new Message<>(MessageTypeEnum.ERROR,"Internal server error. Could not fetch households");
+            Logger.error("Error fetching household by name and password: " + e.getMessage());
+        }
+        return message;
     }
 
     public List<StatusDTO> getAllStatus() {

@@ -2,6 +2,7 @@ package controllers;
 
 import dbcontext.DataHandler;
 import dto.*;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -49,12 +50,6 @@ public class MainController {
     taskLimit = 4;
     taskPageCount = 1;
 
-    // Fetch Data
-    household = dataHandler.getAllHouseholds().getFirst();
-    initialStatusList = dataHandler.getAllStatus();
-    initialPriorityList = dataHandler.getAllPriorities();
-    initialUserList = dataHandler.getAllUsersByHousehold(household.getId());
-
     // Configure Table Columns
     descriptionColumn.setCellValueFactory(cellData ->
       new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescription()));
@@ -74,10 +69,21 @@ public class MainController {
         cellData.getValue().getUser() != null ? cellData.getValue().getUser().getName() : "Unassigned"
       ));
 
-    // Load Data into Table
-    taskTable.setItems(getAllTasks());
 
-    userTable.setItems(getAllUsers());
+
+    Platform.runLater(()->{
+      // Fetch Data
+      initialStatusList = dataHandler.getAllStatus();
+      initialPriorityList = dataHandler.getAllPriorities();
+      initialUserList = dataHandler.getAllUsersByHousehold(household.getId());
+
+      // Load data into table
+      taskTable.setItems(getAllTasks());
+
+      // Load data into user list
+      userTable.setItems(getAllUsers());
+    });
+
 
     // Attach Button Actions
     addTaskBtn.setOnAction(this::handleAddTask);
@@ -85,10 +91,13 @@ public class MainController {
     closeDoneBtn.setOnAction(e -> Logger.info("Close done tasks clicked!"));
     addUserBtn.setOnAction(this::handleAddUser);
 
-    //nextTaskPage.setOnAction(this::handleNextTaskPage);
-    //previousTaskPage.setOnAction(this::handlePreviousTaskPage);
-
     searchField.setOnAction(this::handleSearchDescription);
+  }
+
+  // Method to receive the HouseholdDTO object
+  public void setHousehold(HouseholdDTO household) {
+    this.household = household;
+    System.out.println("Household received: " + household.getName()); // Debugging
   }
 
   private ObservableList<TaskDTO> getAllTasks() {
