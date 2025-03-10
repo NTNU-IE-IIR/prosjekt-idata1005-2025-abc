@@ -29,9 +29,9 @@ public class MainController {
 
   private DataHandler dataHandler;
   private HouseholdDTO household;
-  private List<StatusDTO> initalStatusList;
-  private List<PriorityDTO> initalPriorityList;
-  private List<UserDTO> initalUserList;
+  private List<StatusDTO> initialStatusList;
+  private List<PriorityDTO> initialPriorityList;
+  private List<UserDTO> initialUserList;
   private int taskLimit;
   private int taskPageCount;
 
@@ -49,9 +49,9 @@ public class MainController {
 
     // Fetch Data
     household = dataHandler.getAllHouseholds().getFirst();
-    initalStatusList = dataHandler.getAllStatus();
-    initalPriorityList = dataHandler.getAllPriorities();
-    initalUserList = dataHandler.getAllUsersByHousehold(household.getId());
+    initialStatusList = dataHandler.getAllStatus();
+    initialPriorityList = dataHandler.getAllPriorities();
+    initialUserList = dataHandler.getAllUsersByHousehold(household.getId());
 
     // Configure Table Columns
     descriptionColumn.setCellValueFactory(cellData ->
@@ -79,7 +79,7 @@ public class MainController {
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
     closeDoneBtn.setOnAction(e -> Logger.info("Close done tasks clicked!"));
-    addUserBtn.setOnAction(e -> Logger.info("Add user clicked!"));
+    addUserBtn.setOnAction(this::handleAddUser);
 
     //nextTaskPage.setOnAction(this::handleNextTaskPage);
     //previousTaskPage.setOnAction(this::handlePreviousTaskPage);
@@ -90,6 +90,45 @@ public class MainController {
   private ObservableList<TaskDTO> getAllTasks() {
     return FXCollections.observableArrayList(dataHandler.getAllTasks(household.getId()));
   }
+  private void handleAddUser(ActionEvent event){
+    Dialog<UserDTO> dialog = createBasicDialog("Add New User", "Enter user details");
+    GridPane grid = createDialogGrid();
+
+    TextField nameField = new TextField();
+    nameField.setPromptText("User name");
+
+    ComboBox<UserDTO> nameComboBox = createComboBox(initialUserList);
+
+    Label errorLabel = new Label();
+    grid.add(new Label("Name"),0,0);
+    grid.add(nameField, 0, 0);
+
+      ButtonType addButton = new ButtonType("Add",ButtonBar.ButtonData.OK_DONE);
+      setupDialogButtons(dialog, addButton);
+
+      dialog.getDialogPane().setContent(grid);
+
+      dialog.getDialogPane().lookupButton(addButton).addEventFilter(ActionEvent.ACTION, e -> {
+        if(nameField.getText().trim().isEmpty()){
+          errorLabel.setText("Name field cannot be empty!");
+          e.consume();
+        }else{
+          errorLabel.setText("");
+        }});
+
+      dialog.setResultConverter(dialogButton -> {
+        if(dialogButton == addButton){
+          return new UserDTO(0, nameField.getText(),household);
+        }
+        return null;
+      });
+      Optional<UserDTO> result = dialog.showAndWait();
+        result.ifPresent(user -> {
+            dataHandler.addUser(user);
+            initialUserList.add(user);
+            Logger.info("User added successfully");
+        });
+  }
 
   // Handles Add Task Button
   private void handleAddTask(ActionEvent event) {
@@ -99,8 +138,8 @@ public class MainController {
     // Form Inputs
     TextField descriptionField = new TextField();
     descriptionField.setPromptText("Task description");
-    ComboBox<PriorityDTO> priorityCombo = createComboBox(initalPriorityList);
-    ComboBox<UserDTO> userCombo = createComboBox(initalUserList);
+    ComboBox<PriorityDTO> priorityCombo = createComboBox(initialPriorityList);
+    ComboBox<UserDTO> userCombo = createComboBox(initialUserList);
     Label errorLabel = new Label();
 
     // Add Elements to Grid

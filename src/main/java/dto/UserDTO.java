@@ -25,4 +25,8 @@ public class UserDTO {
   public String toString() {
     return name;
   }
+
+  public HouseholdDTO getHousehold() {
+        return household;
+    }
 }

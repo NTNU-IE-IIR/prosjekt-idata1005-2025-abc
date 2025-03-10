@@ -132,4 +132,17 @@ public class DataHandler {
         return tasks;
     }
 
+    public void addUser(UserDTO user) {
+        String query = "INSERT INTO users (name, householdId) VALUES (?, ?)";
+        try {
+            int rowsAffected = dbHelper.executeUpdate(query, user.getName(), user.getHousehold().getId());
+            if (rowsAffected > 0) {
+                Logger.info("User added successfully: " + user.getName());
+            } else {
+                Logger.error("Failed to add user: " + user.getName());
+            }
+        } catch (SQLException e) {
+            Logger.error("Error adding user: " + e.getMessage());
+        }
+    }
 }
