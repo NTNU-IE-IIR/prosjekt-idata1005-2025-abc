@@ -72,4 +72,7 @@ public class TaskDTO {
   public void setStatus(StatusDTO status){
     this.status = status;
   }
+  public void setPriority(PriorityDTO priority){
+    this.priority = priority;
+  }
 }
