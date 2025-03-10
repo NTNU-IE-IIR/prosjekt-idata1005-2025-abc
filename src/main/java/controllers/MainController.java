@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import utils.Logger;
@@ -24,8 +25,8 @@ public class MainController {
   @FXML private TableView<TaskDTO> taskTable;
   @FXML private ListView<UserDTO> userTable;
   @FXML private TableColumn<TaskDTO, String> descriptionColumn;
-  @FXML private TableColumn<TaskDTO, String> statusColumn;
-  @FXML private TableColumn<TaskDTO, String> priorityColumn;
+  @FXML private TableColumn<TaskDTO, StatusDTO> statusColumn;
+  @FXML private TableColumn<TaskDTO, PriorityDTO> priorityColumn;
   @FXML private TableColumn<TaskDTO, String> userColumn;
   @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage;
   @FXML private TextField searchField;
@@ -50,26 +51,24 @@ public class MainController {
     taskLimit = 4;
     taskPageCount = 1;
 
+    taskTable.setEditable(true);
     // Configure Table Columns
     descriptionColumn.setCellValueFactory(cellData ->
       new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescription()));
 
     statusColumn.setCellValueFactory(cellData ->
-      new javafx.beans.property.SimpleStringProperty(
-        cellData.getValue().getStatus() != null ? cellData.getValue().getStatus().getName() : "N/A"
-      ));
+      new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getStatus()));
+
+    statusColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialStatusList)));
 
     priorityColumn.setCellValueFactory(cellData ->
-      new javafx.beans.property.SimpleStringProperty(
-        cellData.getValue().getPriority() != null ? cellData.getValue().getPriority().getName() : "N/A"
-      ));
+      new javafx.beans.property.SimpleObjectProperty(cellData.getValue().getPriority()));
+    priorityColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialPriorityList)));
 
     userColumn.setCellValueFactory(cellData ->
       new javafx.beans.property.SimpleStringProperty(
         cellData.getValue().getUser() != null ? cellData.getValue().getUser().getName() : "Unassigned"
       ));
-
-
 
     Platform.runLater(()->{
       // Fetch Data
@@ -90,6 +89,17 @@ public class MainController {
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
     closeDoneBtn.setOnAction(e -> Logger.info("Close done tasks clicked!"));
     addUserBtn.setOnAction(this::handleAddUser);
+
+    statusColumn.setOnEditCommit(event -> {
+        TaskDTO task = event.getRowValue();
+        task.setStatus(event.getNewValue());
+        dataHandler.updateTask(task);
+    });
+    priorityColumn.setOnEditCommit(event -> {
+      TaskDTO task = event.getRowValue();
+      task.setPriority(event.getNewValue());
+      dataHandler.updateTask(task);
+    });
 
     searchField.setOnAction(this::handleSearchDescription);
   }
