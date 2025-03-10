@@ -16,7 +16,7 @@
 
             <HBox fx:id="searchContainer" alignment="CENTER_LEFT" styleClass="search-container">
                 <ImageView fitWidth="17" fitHeight="17">
-                    <Image url="@/icons/search-icon.png"/>
+                    <Image url="@../icons/search-icon.png"/>
                 </ImageView>
                 <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field"/>
             </HBox>

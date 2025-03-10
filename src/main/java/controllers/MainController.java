@@ -59,11 +59,7 @@ public class MainController {
     statusColumn.setCellValueFactory(cellData ->
       new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getStatus()));
 
-    statusColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialStatusList)));
 
-    priorityColumn.setCellValueFactory(cellData ->
-      new javafx.beans.property.SimpleObjectProperty(cellData.getValue().getPriority()));
-    priorityColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialPriorityList)));
 
     userColumn.setCellValueFactory(cellData ->
       new javafx.beans.property.SimpleStringProperty(
@@ -81,6 +77,12 @@ public class MainController {
 
       // Load data into user list
       userTable.setItems(getAllUsers());
+
+      statusColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialStatusList)));
+
+      priorityColumn.setCellValueFactory(cellData ->
+          new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getPriority()));
+      priorityColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialPriorityList)));
     });
 
 
