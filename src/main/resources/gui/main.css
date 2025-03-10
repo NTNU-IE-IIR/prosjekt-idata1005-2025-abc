@@ -40,3 +40,27 @@
     -fx-background-color: #eeeeee;
     -fx-font-weight: bold;
 }
+
+/* Default search container style */
+.search-container {
+    -fx-border-width: 2px;
+    -fx-border-color: #333333;
+    -fx-border-radius: 6px;
+    -fx-padding: 5px 10px;
+    -fx-background-color: white;
+}
+
+/* Image inside the Search Box */
+.search-container .image-view {
+    -fx-fit-width: 17px;
+    -fx-fit-height: 17px;
+}
+
+/* Remove Default Border from TextField */
+.search-field {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;  /* Removes extra background */
+    -fx-padding: 5px;  /* Ensures proper vertical alignment */
+    -fx-font-size: 16px;
+    -fx-min-width: 220px;
+}

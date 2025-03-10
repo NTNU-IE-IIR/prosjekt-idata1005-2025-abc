@@ -4,6 +4,7 @@ import dbcontext.DataHandler;
 import dto.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -87,7 +88,7 @@ public class MainController {
     //nextTaskPage.setOnAction(this::handleNextTaskPage);
     //previousTaskPage.setOnAction(this::handlePreviousTaskPage);
 
-    searchField.setOnAction(e -> Logger.info("Search tasks for: " + searchField.getText()));
+    searchField.setOnAction(this::handleSearchDescription);
   }
 
   private ObservableList<TaskDTO> getAllTasks() {
@@ -187,6 +188,15 @@ public class MainController {
       Logger.info("Task added successfully");
     });
   }
+
+  private void handleSearchDescription(ActionEvent event) {
+    String userQuery = searchField.getText();
+    List<TaskDTO> query = dataHandler.getAllTasks(household.getId(), userQuery);
+    ObservableList<TaskDTO> result = FXCollections.observableArrayList(query);
+    Logger.info("Search tasks for: " + searchField.getText());
+    taskTable.setItems(result);
+  }
+
 
   private void handleNextTaskPage(ActionEvent event) {
     taskPageCount++;
