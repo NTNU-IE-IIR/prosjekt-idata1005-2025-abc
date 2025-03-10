@@ -3,7 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="controllers.MainController">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<BorderPane fx:id="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
 
     <!-- Top Bar -->
     <top>
@@ -11,7 +13,14 @@
             <Button fx:id="addTaskBtn" text="Add new task" />
             <Button fx:id="distributeBtn" text="Distribute all tasks" />
             <Button fx:id="closeDoneBtn" text="Close done tasks" />
-            <TextField fx:id="searchField" promptText="Search tasks..." />
+
+            <HBox fx:id="searchContainer" alignment="CENTER_LEFT" styleClass="search-container">
+                <ImageView fitWidth="17" fitHeight="17">
+                    <Image url="@/icons/search-icon.png"/>
+                </ImageView>
+                <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field"/>
+            </HBox>
+
         </HBox>
     </top>
 
