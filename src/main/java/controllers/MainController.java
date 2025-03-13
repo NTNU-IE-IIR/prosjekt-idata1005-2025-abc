@@ -26,7 +26,7 @@ public class MainController {
   @FXML private TableColumn<TaskDTO, StatusDTO> statusColumn;
   @FXML private TableColumn<TaskDTO, PriorityDTO> priorityColumn;
   @FXML private TableColumn<TaskDTO, String> userColumn;
-  @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage;
+  @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage, logoutButton;
   @FXML private TextField searchField;
 
   private DataHandler dataHandler;
@@ -36,6 +36,7 @@ public class MainController {
   private List<UserDTO> initialUserList;
   private int taskLimit;
   private int taskPageCount;
+  private static int numberOfContextMenus = 0;
 
   @FXML
   public void initialize() {
@@ -134,14 +135,17 @@ public class MainController {
     deleteTask.setOnAction(e -> {
       dataHandler.deleteTask(task);
       taskTable.setItems(FXCollections.observableArrayList(dataHandler.getAllTasksByHouseHold(household.getId())));
+      numberOfContextMenus++;
     });
 
     MenuItem editTask = new MenuItem("Edit Task");
     editTask.setOnAction(e -> {
       Optional<TaskDTO> result = TaskDialogFactory.createEditTaskDialog(task, household, initialStatusList, initialPriorityList, initialUserList).showAndWait();
       result.ifPresent(editedTask -> {
+
         dataHandler.editTask(editedTask);
         taskTable.setItems(getAllTasks());
+        numberOfContextMenus++;
       });
     });
 

@@ -55,7 +55,17 @@
     -fx-fit-width: 17px;
     -fx-fit-height: 17px;
 }
-
+.logout-button{
+    -fx-background-color: #a21ab1;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-border-color: #a6168e;
+    -fx-border-width: 1px;
+}
 /* Remove Default Border from TextField */
 .search-field {
     -fx-border-width: 0;
@@ -63,4 +73,5 @@
     -fx-padding: 5px;  /* Ensures proper vertical alignment */
     -fx-font-size: 16px;
     -fx-min-width: 220px;
+
 }

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <BorderPane fx:id="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
 
     <!-- Top Bar -->
@@ -15,10 +14,18 @@
             <Button fx:id="closeDoneBtn" text="Close done tasks" />
 
             <HBox fx:id="searchContainer" alignment="CENTER_LEFT" styleClass="search-container">
-                <ImageView fitWidth="17" fitHeight="17">
-                    <Image url="@../icons/search-icon.png"/>
+                <ImageView fitHeight="17" fitWidth="17">
+                    <Image url="@../icons/search-icon.png" />
                 </ImageView>
-                <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field"/>
+                <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
+            </HBox>
+            <HBox fx:id="logoutField" alignment="CENTER_RIGHT">
+                <Button fx:id="logoutButton" accessibleRole="BUTTON" text="Logout" styleClass = "logout-button">
+               <graphic>
+                      <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
+                          <Image url="@../icons/connect-icon.png" />
+                      </ImageView>
+               </graphic></Button>
             </HBox>
 
         </HBox>
