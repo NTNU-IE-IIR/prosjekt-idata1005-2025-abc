@@ -8,38 +8,40 @@ import dto.TaskDTO;
 import dto.UserDTO;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import java.util.List;
 
-public class TaskDialogFactory {
+/**
+ * Factory class for creating dialogs related to Task operations.
+ * It provides methods to create dialogs for adding or editing a task.
+ */
+public class TaskDialogFactory extends DialogFactory {
 
-    private static <T> Dialog<T> createBasicDialog(String title, String header) {
-        Dialog<T> dialog = new Dialog<>();
-        dialog.setTitle(title);
-        dialog.setHeaderText(header);
-        return dialog;
-    }
-
-    private static GridPane createDialogGrid() {
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-        return grid;
-    }
-
-    private static void setupDialogButtons(Dialog<?> dialog, ButtonType... buttons) {
-        dialog.getDialogPane().getButtonTypes().addAll(buttons);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
-    }
-
-    public static Dialog<TaskDTO> createEditTaskDialog(TaskDTO currentTask, HouseholdDTO household, List<StatusDTO> statuses, List<PriorityDTO> priorities, List<UserDTO> users) {
+    /**
+     * Creates a dialog to edit an existing task.
+     *
+     * @param currentTask the task being edited
+     * @param household   the associated household
+     * @param statuses    the list of available task statuses
+     * @param priorities  the list of available priorities
+     * @param users       the list of available users
+     * @return a Dialog that returns an updated TaskDTO on success, or null on cancel
+     */
+    public static Dialog<TaskDTO> createEditTaskDialog(TaskDTO currentTask, HouseholdDTO household,
+                                                       List<StatusDTO> statuses, List<PriorityDTO> priorities,
+                                                       List<UserDTO> users) {
         Dialog<TaskDTO> dialog = createBasicDialog("Edit Task", "Enter task details");
         GridPane grid = createDialogGrid();
 
         TextField taskField = new TextField(currentTask.getDescription());
         taskField.setPromptText("New task name");
+
         ComboBox<PriorityDTO> priorityCombo = new ComboBox<>();
         priorityCombo.getItems().addAll(priorities);
         priorityCombo.setValue(currentTask.getPriority());
@@ -69,7 +71,7 @@ public class TaskDialogFactory {
         dialog.getDialogPane().setContent(grid);
 
         dialog.getDialogPane().lookupButton(editButton).addEventFilter(ActionEvent.ACTION, e -> {
-            if(taskField.getText().trim().isEmpty()){
+            if (taskField.getText().trim().isEmpty()) {
                 errorLabel.setText("Task name cannot be empty!");
                 e.consume();
             } else {
@@ -78,24 +80,37 @@ public class TaskDialogFactory {
         });
 
         dialog.setResultConverter(button -> {
-            if(button == editButton){
-                return new TaskDTO(currentTask.getId(), taskField.getText(), household, statusCombo.getValue(), priorityCombo.getValue(), userCombo.getValue());
+            if (button == editButton) {
+                return new TaskDTO(currentTask.getId(), taskField.getText(), household,
+                        statusCombo.getValue(), priorityCombo.getValue(), userCombo.getValue());
             }
             return null;
         });
         return dialog;
     }
 
-    public static Dialog<TaskDTO> createAddTaskDialog(HouseholdDTO household, List<PriorityDTO> priorities, List<UserDTO> users) {
+    /**
+     * Creates a dialog to add a new task.
+     *
+     * @param household  the associated household for the new task
+     * @param priorities the list of available priorities
+     * @param users      the list of available users
+     * @return a Dialog that returns a new TaskDTO on success, or null on cancel
+     */
+    public static Dialog<TaskDTO> createAddTaskDialog(HouseholdDTO household, List<PriorityDTO> priorities,
+                                                      List<UserDTO> users) {
         Dialog<TaskDTO> dialog = createBasicDialog("Add New Task", "Enter task details");
         GridPane grid = createDialogGrid();
 
         TextField descriptionField = new TextField();
         descriptionField.setPromptText("Task description");
+
         ComboBox<PriorityDTO> priorityCombo = new ComboBox<>();
         priorityCombo.getItems().addAll(priorities);
+
         ComboBox<UserDTO> userCombo = new ComboBox<>();
         userCombo.getItems().addAll(users);
+
         Label errorLabel = new Label();
 
         grid.add(new Label("Description:"), 0, 0);
@@ -111,7 +126,7 @@ public class TaskDialogFactory {
         dialog.getDialogPane().setContent(grid);
 
         dialog.getDialogPane().lookupButton(addButton).addEventFilter(ActionEvent.ACTION, e -> {
-            if(descriptionField.getText().trim().isEmpty()){
+            if (descriptionField.getText().trim().isEmpty()) {
                 errorLabel.setText("Description cannot be empty!");
                 e.consume();
             } else {
@@ -120,7 +135,7 @@ public class TaskDialogFactory {
         });
 
         dialog.setResultConverter(button -> {
-            if(button == addButton){
+            if (button == addButton) {
                 return new TaskDTO(descriptionField.getText(), household, priorityCombo.getValue(), userCombo.getValue());
             }
             return null;

@@ -20,7 +20,7 @@
                 <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
             </HBox>
             <HBox fx:id="logoutField" alignment="CENTER_RIGHT">
-                <Button fx:id="logoutButton" accessibleRole="BUTTON" text="Logout" styleClass = "logout-button">
+                <Button fx:id="logoutButton" accessibleRole="BUTTON" alignment="CENTER_RIGHT" styleClass="logout-button" text="Logout">
                <graphic>
                       <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
                           <Image url="@../icons/connect-icon.png" />
