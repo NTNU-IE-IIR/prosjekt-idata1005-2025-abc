@@ -19,7 +19,7 @@ import utils.HashUtil;
 import utils.Message;
 import utils.MessageTypeEnum;
 import utils.PreferenceUtil;
-
+import javafx.stage.Screen;
 import java.lang.runtime.SwitchBootstraps;
 import java.util.Objects;
 import java.util.prefs.Preferences;
@@ -96,6 +96,11 @@ public class LoginController {
       Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
       stage.setScene(mainScene);
       stage.setTitle("Main Application");
+
+      stage.setMaximized(true);
+      stage.setWidth(Screen.getPrimary().getVisualBounds().getWidth());
+      stage.setHeight(Screen.getPrimary().getVisualBounds().getHeight());
+
       stage.centerOnScreen();
     } catch (Exception e) {
       e.printStackTrace();

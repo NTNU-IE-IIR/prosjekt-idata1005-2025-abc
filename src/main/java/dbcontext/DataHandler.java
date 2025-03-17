@@ -79,15 +79,24 @@ public class DataHandler {
         return -1;
     }
 
-    public void addTask(TaskDTO task) {
+    public Message<Void> addTask(TaskDTO task) {
+        Message<Void> message;
         String query = "INSERT INTO tasks (householdId, description, statusId, priorityId, ownerId) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try {
             int rowsAffected = dbHelper.executeUpdate(query, task.getHouseholdId(),
                     task.getDescription(), 3, task.getPriorityId(), task.getUserId());
+
+            if (rowsAffected == 0) {
+                message = new Message<>(MessageTypeEnum.ERROR, "Could not add the task.");
+            } else {
+                message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully added the task!");
+            }
         } catch (SQLException e) {
+            message = new Message<>(MessageTypeEnum.ERROR, "Internal server error. Could not add the task.");
             Logger.error("Error adding task: " + e.getMessage());
         }
+        return message;
     }
 
     public List<UserDTO> getAllUsersByHousehold(int householdId) {

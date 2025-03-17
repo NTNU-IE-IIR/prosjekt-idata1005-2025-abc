@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.Image?>
+<HBox fx:id="container" spacing="10" alignment="CENTER_LEFT" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml">
+
+    <!-- User Name as a Button Styled as a Link -->
+    <Button fx:id="nameButton" styleClass="user-link"/>
+
+    <!-- Spacer to push buttons to the right -->
+    <Region HBox.hgrow="ALWAYS" />
+
+    <!-- Edit Button -->
+    <Button fx:id="editButton" styleClass="icon-button">
+        <graphic>
+            <ImageView fx:id="editIcon" fitHeight="20" preserveRatio="true">
+                <Image url="@../icons/edit-icon.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+
+    <!-- Delete Button -->
+    <Button fx:id="deleteButton" styleClass="icon-button">
+        <graphic>
+            <ImageView fx:id="deleteIcon" fitHeight="20" preserveRatio="true">
+                <Image url="@../icons/delete-icon.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+
+</HBox>

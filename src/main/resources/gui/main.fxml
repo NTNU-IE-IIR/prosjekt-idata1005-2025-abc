@@ -7,19 +7,24 @@
 <BorderPane fx:id="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
 
     <!-- Top Bar -->
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="top-bar">
-            <Button fx:id="addTaskBtn" text="Add new task" />
-            <Button fx:id="distributeBtn" text="Distribute all tasks" />
-            <Button fx:id="closeDoneBtn" text="Close done tasks" />
+    <top >
+        <HBox spacing="10" style="-fx-padding: 20px 30px;" styleClass="top-bar">
+            <!-- ABC Logo -->
+            <ImageView fitHeight="40" preserveRatio="true">
+                <Image url="@../icons/abc-logo.png"/>
+            </ImageView>
 
-            <HBox alignment="CENTER_LEFT" styleClass="search-container">
-                <ImageView fitHeight="17" fitWidth="17">
-                    <Image url="@../icons/search-icon.png" />
-                </ImageView>
-                <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
-            </HBox>
-            <Button fx:id="logoutButton" onAction="#handleLogout" alignment="CENTER_RIGHT" styleClass="logout-button" text="Logout">
+            <!-- Spacer (Pushes elements apart) -->
+            <Region fx:id="spacer" />
+
+            <!-- Center Label -->
+            <Label text="Household Organization and Management Engine"  styleClass="header-label" />
+
+            <!-- Spacer (Pushes button to the right) -->
+            <Region fx:id="spacer2" />
+
+            <!-- Right-aligned Button -->
+            <Button fx:id="logoutButton" onAction="#handleLogout" styleClass="logout-button" text="Logout">
                 <graphic>
                     <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
                         <Image url="@../icons/connect-icon.png" />
@@ -27,33 +32,88 @@
                 </graphic>
             </Button>
 
+            <!-- Ensure both spacers expand -->
+            <HBox.hgrow>
+                <Priority fx:constant="ALWAYS"/>
+                <Priority fx:constant="ALWAYS"/>
+            </HBox.hgrow>
         </HBox>
     </top>
 
     <!-- Right Bar -->
     <right>
-        <VBox alignment="TOP_CENTER" spacing="15">
-            <Button fx:id="addUserBtn" text="Add people" />
-            <ListView fx:id="userTable" prefHeight="267.0" prefWidth="248.0" />
-        </VBox>
+        <VBox alignment="TOP_CENTER" spacing="-3" styleClass="right-bar">
+            <!-- Header Section -->
+            <HBox spacing="10" styleClass="user-header-container" alignment="CENTER_LEFT">
+                <Label text="People in household" styleClass="user-header-title"/>
+                <Label fx:id="userCount" styleClass="user-count-label"/>
+            </HBox>
 
+            <!-- ListView for Users -->
+            <VBox maxHeight="1000" VBox.vgrow="NEVER">
+                <ListView fx:id="userTable" styleClass="user-list"/>
+            </VBox>
+
+            <!-- "Add People" Button -->
+            <HBox styleClass="add-user-button-container">
+                <Button fx:id="addUserBtn" text="Add people" styleClass="add-user-button">
+                    <graphic>
+                        <ImageView fitHeight="14" fitWidth="14" nodeOrientation="RIGHT_TO_LEFT">
+                            <Image url="@../icons/plus-icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
+        </VBox>
     </right>
+
 
     <!-- Table (Center) -->
     <center>
-        <TableView fx:id="taskTable" styleClass="task-table">
-            <columns>
-                <TableColumn fx:id="descriptionColumn" text="Description" />
-                <TableColumn fx:id="statusColumn" text="Status" />
-                <TableColumn fx:id="priorityColumn" text="Priority" />
-                <TableColumn fx:id="userColumn" text="User" />
-            </columns>
-        </TableView>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="tool-bar">
+                <HBox alignment="CENTER_LEFT" styleClass="search-container">
+                    <ImageView fitHeight="17" preserveRatio="true">
+                        <Image url="@../icons/search-icon.png" />
+                    </ImageView>
+                    <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
+                </HBox>
+
+                <Button fx:id="addTaskBtn" text="Add new task" alignment="CENTER">
+                    <graphic>
+                        <ImageView fitHeight="17" preserveRatio="true">
+                            <Image url="@../icons/plus-icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="distributeBtn" text="Distribute all tasks">
+                    <graphic>
+                        <ImageView fitHeight="14" preserveRatio="true">
+                            <Image url="@../icons/auto-distribute-icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="closeDoneBtn" text="Close done tasks">
+                    <graphic>
+                        <ImageView fitHeight="14" preserveRatio="true">
+                            <Image url="@../icons/double-check-icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <TableView fx:id="taskTable" styleClass="task-table">
+                <columns>
+                    <TableColumn fx:id="descriptionColumn" text="Description" />
+                    <TableColumn fx:id="statusColumn" text="Status" />
+                    <TableColumn fx:id="priorityColumn" text="Priority" />
+                    <TableColumn fx:id="userColumn" text="User" />
+                </columns>
+            </TableView>
+        </VBox>
+
     </center>
-    <bottom>
-        <HBox alignment="CENTER_LEFT" spacing="15">
-            <Button fx:id="previousTaskPage" text="Previous page" />
-            <Button fx:id="nextTaskPage" text="Next page" />
-        </HBox>
-    </bottom>
+
 </BorderPane>

@@ -1,8 +1,10 @@
 // Language: java
 package controllers;
 
+import controllers.helpers.UserListCellController;
 import dbcontext.DataHandler;
 import dto.*;
+import javafx.beans.binding.Bindings;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,9 +19,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import utils.Logger;
+import utils.Message;
+import utils.MessageTypeEnum;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,15 +46,17 @@ public class MainController {
   @FXML private TableColumn<TaskDTO, String> userColumn;
   @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage, logoutButton;
   @FXML private TextField searchField;
+  @FXML private Label userCount;
+
+  @FXML private Region spacer;  // Reference to the first spacer
+  @FXML private Region spacer2; // Reference to the second spacer
 
   private DataHandler dataHandler;
   private HouseholdDTO household;
+  private ObservableList<TaskDTO> taskList;
   private List<StatusDTO> initialStatusList;
   private List<PriorityDTO> initialPriorityList;
-  private List<UserDTO> initialUserList;
-  private int taskLimit;
-  private int taskPageCount;
-  private static int numberOfContextMenus = 0;
+  private ObservableList<UserDTO> initialUserList;
 
   /**
    * Initializes the MainController by setting up UI elements, registering event handlers,
@@ -59,9 +65,12 @@ public class MainController {
   @FXML
   public void initialize() {
     root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/main.css")).toExternalForm());
+    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/global.css")).toExternalForm());
     dataHandler = new DataHandler();
-    taskLimit = 4;
-    taskPageCount = 1;
+
+    // Ensure both spacers expand to push elements apart
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+    HBox.setHgrow(spacer2, Priority.ALWAYS);
 
     taskTable.setEditable(true);
     descriptionColumn.setCellValueFactory(cellData ->
@@ -73,19 +82,32 @@ public class MainController {
                     cellData.getValue().getUser() != null ? cellData.getValue().getUser().getName() : "Unassigned"
             ));
 
+    userTable.setFixedCellSize(70);
+    userTable.setCellFactory(param -> new UserListCellController(this::handleUserClicked, this::handleUserEdit, this::handleUserDelete));
+
     Platform.runLater(() -> {
       initialStatusList = dataHandler.getAllStatus();
       initialPriorityList = dataHandler.getAllPriorities();
-      initialUserList = dataHandler.getAllUsersByHousehold(household.getId());
+      taskList = FXCollections.observableArrayList(dataHandler.getAllTasksByHouseHold(household.getId()));
+      initialUserList =  FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId()));
 
-      taskTable.setItems(getAllTasks());
-      userTable.setItems(getAllUsers());
+      taskTable.setItems(taskList);
+      userTable.setItems(initialUserList);
 
       statusColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialStatusList)));
       priorityColumn.setCellValueFactory(cellData ->
               new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getPriority()));
       priorityColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialPriorityList)));
+
+      // Bind the label's text to the size of the list
+      userCount.textProperty().bind(
+          Bindings.size(initialUserList).asString()
+      );
+      userTable.prefHeightProperty().bind(
+          Bindings.size(initialUserList).multiply(70).add(20)
+      );
     });
+
 
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
@@ -247,7 +269,6 @@ public class MainController {
     result.ifPresent(user -> {
       dataHandler.addUser(user);
       initialUserList.add(user);
-      userTable.setItems(getAllUsers());
       Logger.info("User added successfully");
     });
   }
@@ -261,9 +282,14 @@ public class MainController {
     Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, initialPriorityList, initialUserList)
             .showAndWait();
     result.ifPresent(task -> {
-      dataHandler.addTask(task);
-      taskTable.setItems(getAllTasks());
-      Logger.info("Task added successfully");
+      Message<Void> resultMsg = dataHandler.addTask(task);
+      if(resultMsg.getType() == MessageTypeEnum.ERROR){
+        Logger.error(resultMsg.getMessage());
+      }
+      else if(resultMsg.getType() == MessageTypeEnum.SUCCESS){
+        Logger.info("Task added successfully");
+        taskList.add(task);
+      }
     });
   }
 
@@ -293,7 +319,22 @@ public class MainController {
     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     stage.setScene(loginScene);
     stage.setTitle("Login Page");
+
+    stage.setMaximized(false);
+    stage.setWidth(800);
+    stage.setHeight(500);
+
     stage.centerOnScreen();
     stage.show();
+  }
+
+  public void handleUserClicked(UserDTO user) {
+    System.out.println("User clicked");
+  }
+  public void handleUserEdit(UserDTO user) {
+    System.out.println("User edited");
+  }
+  public void handleUserDelete(UserDTO user) {
+    System.out.println("User deleted");
   }
 }

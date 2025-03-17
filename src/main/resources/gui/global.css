@@ -1,0 +1,24 @@
+@font-face {
+    font-family: "Inter 18pt Regular";
+    src: url("/fonts/Inter_18pt-Regular.ttf");
+}
+@font-face {
+    font-family: "Inter 18pt Medium";
+    src: url("/fonts/Inter_18pt-Medium.ttf");
+}
+
+@font-face {
+    font-family: "Inter 18pt SemiBold";
+    src: url("/fonts/Inter_18pt-SemiBold.ttf");
+}
+
+@font-face {
+    font-family: "Inter 28pt Medium";
+    src: url("/fonts/Inter_28pt-Medium.ttf");
+}
+
+@font-face {
+    font-family: "Inter 28pt SemiBold";
+    src: url("/fonts/Inter_28pt-SemiBold.ttf");
+}
+

@@ -1,29 +1,40 @@
-
-.root {
-    -fx-background-color: #f4f4f4;
-    -fx-font-family: "Segoe UI", sans-serif;
+.root{
+    -fx-background-color: white;
 }
-
 
 .top-bar {
     -fx-background-color: #ffffff;
-    -fx-padding: 10px;
-    -fx-spacing: 15px;
-    -fx-alignment: center-left;
-    -fx-border-color: #cccccc;
-    -fx-border-width: 0 0 1 0;
+    -fx-padding: 30px 40px;
+    -fx-border-color: #F6F6F6;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: solid;
+}
+
+.header-label {
+    -fx-font-family: "Inter 28pt SemiBold";
+    -fx-font-size: 28px;
+    -fx-text-fill: #333333;
+}
+
+.tool-bar{
+    -fx-padding: 15px;
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #F6F6F6 transparent;
+    -fx-border-width: 0 0 3px 0;
 }
 
 .button {
-    -fx-background-color: #007ACC;
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 14px;
-    -fx-padding: 8px 15px;
-    -fx-background-radius: 5px;
+    -fx-background-color: #D6F8FF;
+    -fx-text-fill: #333333;
+    -fx-font-family:"Inter 18pt Medium";
+    -fx-font-size: 18px;
+    -fx-padding: 0px 15px;
+    -fx-min-height: 42px;
+    -fx-background-radius: 6px;
     -fx-cursor: hand;
 }
 .button:hover {
-    -fx-background-color: #005999;
+    -fx-background-color: #E5FBFF;
 }
 
 .text-field {
@@ -32,21 +43,12 @@
     -fx-border-radius: 5px;
 }
 
-.task-table {
-    -fx-background-color: #ffffff;
-    -fx-table-cell-border-color: #dddddd;
-}
-.table-column-header {
-    -fx-background-color: #eeeeee;
-    -fx-font-weight: bold;
-}
-
 /* Default search container style */
 .search-container {
     -fx-border-width: 2px;
     -fx-border-color: #333333;
     -fx-border-radius: 6px;
-    -fx-padding: 5px 10px;
+    -fx-padding: 3px 10px;
     -fx-background-color: white;
 }
 
@@ -67,7 +69,98 @@
     -fx-border-width: 0;
     -fx-background-color: transparent;  /* Removes extra background */
     -fx-padding: 5px;  /* Ensures proper vertical alignment */
-    -fx-font-size: 16px;
-    -fx-min-width: 220px;
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 18px;
+    -fx-min-width: 250px;
+}
 
+.right-bar{
+    -fx-min-width: 380px;
+    -fx-border-color: transparent transparent  transparent #F6F6F6 ;
+    -fx-border-width: 0 0 0 3px;
+    -fx-padding: 0 0 20px 0;
+}
+
+.user-list {
+    -fx-background-color: transparent; /* Removes background */
+    -fx-border-color: transparent; /* Removes border */
+}
+
+.list-cell {
+    -fx-border-color: #F6F6F6 transparent transparent  transparent;
+    -fx-border-width: 2px 0 0 0;
+    -fx-background-color: transparent;
+    -fx-padding: 0 20px 0 0;
+}
+
+.list-cell:filled:selected, .list-cell:filled:selected:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: inherit; /* Keeps text color unchanged */
+}
+
+.list-cell:hover {
+    -fx-background-color: transparent;
+}
+
+.user-header-container{
+    -fx-padding: 16px 20px;
+    -fx-border-color: transparent transparent #F6F6F6 transparent; /* Bottom border only */
+    -fx-border-width: 0 0 2px 0; /* 2px border at the bottom */
+}
+
+.user-header-title{
+    -fx-font-family: "Inter 18pt SemiBold";
+    -fx-font-size: 18px;
+    -fx-text-fill: #333333;
+}
+
+.user-count-label{
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 18px;
+    -fx-text-fill: #6A6A6A;
+    -fx-background-color: #F6F6F6;
+    -fx-background-radius: 12px;
+    -fx-padding: 6px 12px;
+}
+
+.user-link {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #4683C0; /* Blue color */
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 18px;
+    -fx-underline: true; /* Adds underline */
+    -fx-cursor: hand;
+}
+.user-link:hover {
+    -fx-text-fill: #007FFF; /* Stronger blue on hover */
+    -fx-background-color: transparent;
+}
+.add-user-button-container{
+    -fx-padding: 10px;
+    -fx-border-color: #F6F6F6 transparent transparent  transparent;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.add-user-button{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #333333;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+}
+.add-user-button:hover {
+    -fx-underline: true;
+    -fx-text-fill: #6A6A6A ;
+    -fx-background-color: transparent;
+}
+
+.icon-button{
+    -fx-background-color: #F6F6F6;
+    -fx-background-radius: 7px;
+    -fx-padding: 4px 12px;
+}
+
+.icon-button:hover{
+    -fx-background-color:#DEDEDE;
 }
