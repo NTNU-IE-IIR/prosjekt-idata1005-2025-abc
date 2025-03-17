@@ -9,12 +9,19 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import utils.Logger;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -274,11 +281,19 @@ public class MainController {
   }
 
   /**
-   * Calculates the task offset for pagination based on the current page count.
+   * Handles the logout action for pressing button "logout"
    *
-   * @return the offset as an integer value for pagination
+   * @param event the action event triggered by the logout button
    */
-  private int getTaskOffset(){
-    return (taskPageCount - 1) * taskLimit;
+  public void handleLogout(ActionEvent event) throws IOException {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/login.fxml"));
+    Parent loginRoot = loader.load();
+
+    Scene loginScene = new Scene(loginRoot, 800, 500);
+    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+    stage.setScene(loginScene);
+    stage.setTitle("Login Page");
+    stage.centerOnScreen();
+    stage.show();
   }
 }

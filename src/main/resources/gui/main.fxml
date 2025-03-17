@@ -13,20 +13,19 @@
             <Button fx:id="distributeBtn" text="Distribute all tasks" />
             <Button fx:id="closeDoneBtn" text="Close done tasks" />
 
-            <HBox fx:id="searchContainer" alignment="CENTER_LEFT" styleClass="search-container">
+            <HBox alignment="CENTER_LEFT" styleClass="search-container">
                 <ImageView fitHeight="17" fitWidth="17">
                     <Image url="@../icons/search-icon.png" />
                 </ImageView>
                 <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
             </HBox>
-            <HBox fx:id="logoutField" alignment="CENTER_RIGHT">
-                <Button fx:id="logoutButton" accessibleRole="BUTTON" alignment="CENTER_RIGHT" styleClass="logout-button" text="Logout">
-               <graphic>
-                      <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
-                          <Image url="@../icons/connect-icon.png" />
-                      </ImageView>
-               </graphic></Button>
-            </HBox>
+            <Button fx:id="logoutButton" onAction="#handleLogout" alignment="CENTER_RIGHT" styleClass="logout-button" text="Logout">
+                <graphic>
+                    <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
+                        <Image url="@../icons/connect-icon.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
 
         </HBox>
     </top>
