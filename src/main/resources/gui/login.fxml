@@ -13,6 +13,7 @@
            </font>
         </Label>
     </HBox>
+
     <VBox prefHeight="200.0" prefWidth="100.0" spacing="14" style="-fx-max-width: 300;">
         <Label text="Connect to a household">
           <font>
@@ -21,7 +22,11 @@
         </Label>
         <TextField fx:id="usernameField" prefWidth="306.0" promptText="Username"/>
         <PasswordField fx:id="passwordField" promptText="Password"/>
-        <Button onAction="#handleLogin" text="Login"/>
+
+        <HBox spacing="14" alignment="CENTER_LEFT">
+            <Button onAction="#handleLogin" text="Login"/>
+            <CheckBox fx:id="checkRememberMe" text="Remember me" />
+        </HBox>
     </VBox>
 
 </VBox>

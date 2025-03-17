@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -17,29 +18,52 @@ import javafx.stage.Stage;
 import utils.HashUtil;
 import utils.Message;
 import utils.MessageTypeEnum;
+import utils.PreferenceUtil;
 
 import java.lang.runtime.SwitchBootstraps;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 public class LoginController {
 
   @FXML private VBox root;
   @FXML private TextField usernameField;
   @FXML private PasswordField passwordField;
+  @FXML private CheckBox checkRememberMe;
 
   private DataHandler dataHandler;
+  private PreferenceUtil prefUtil;
 
   @FXML public void initialize() {
-    // Load CSS file
-    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/login.css")).toExternalForm());
     // Db context
     dataHandler = new DataHandler();
+    // Load CSS file
+    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/login.css")).toExternalForm());
+
+    // Initialize preferences
+    prefUtil = new PreferenceUtil(this.getClass().getName());
+    if(Boolean.parseBoolean(prefUtil.getSetting("login-is-remembered")))
+      populateFromPreferences();
   }
 
   @FXML
   public void handleLogin(ActionEvent event) {
     String username = usernameField.getText();
-    String password = HashUtil.hashSHA256(passwordField.getText());
+    String password = passwordField.getText();
+    String hashedPassword = HashUtil.hashSHA256(password);
+    boolean isRemembered = checkRememberMe.isSelected();
+
+    // Handle login preferences
+    if(isRemembered){
+      prefUtil.saveSetting("login-username",username);
+      prefUtil.saveSetting("login-password",password);
+      prefUtil.saveSetting("login-is-remembered", "true");
+    }
+    else{
+      prefUtil.saveSetting("login-username","");
+      prefUtil.saveSetting("login-password","");
+      prefUtil.saveSetting("login-is-remembered", "false");
+    }
 
     // Handle empty input fields
     if (username.isEmpty() || password.isEmpty()){
@@ -47,7 +71,7 @@ public class LoginController {
       return;
     }
 
-    Message<HouseholdDTO> resultMessage = dataHandler.getHousehold(username, password);
+    Message<HouseholdDTO> resultMessage = dataHandler.getHousehold(username, hashedPassword);
 
     if(resultMessage.getType() == MessageTypeEnum.ERROR){
       showErrorPopup(event, resultMessage);
@@ -56,7 +80,6 @@ public class LoginController {
 
     loginSuccess(event, resultMessage.getResult());
   }
-
 
   private void loginSuccess(ActionEvent event, HouseholdDTO household) {
     try {
@@ -90,5 +113,11 @@ public class LoginController {
     alert.setHeaderText(null);
     alert.setContentText(message.getMessage());
     alert.showAndWait();
+  }
+
+  private void populateFromPreferences() {
+    usernameField.setText(prefUtil.getSetting("login-username"));
+    passwordField.setText(prefUtil.getSetting("login-password"));
+    checkRememberMe.setSelected(true);
   }
 }
