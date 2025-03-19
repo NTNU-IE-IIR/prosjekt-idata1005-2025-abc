@@ -17,7 +17,7 @@ public class UserDTO {
    * Constructs a UserDTO with the specified id, name, and household.
    *
    * @param id        the user id
-   * @param name      the user name
+   * @param name      the username
    * @param household the household associated with the user
    */
   public UserDTO(int id, String name, HouseholdDTO household) {
@@ -36,7 +36,14 @@ public class UserDTO {
   }
 
   /**
-   * Returns the user name.
+   * Set the user id.
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  /**
+   * Returns the username.
    *
    * @return the name of the user
    */

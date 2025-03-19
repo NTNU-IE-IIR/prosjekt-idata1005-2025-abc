@@ -56,7 +56,7 @@ public class MainController {
   private ObservableList<TaskDTO> taskList;
   private List<StatusDTO> initialStatusList;
   private List<PriorityDTO> initialPriorityList;
-  private ObservableList<UserDTO> initialUserList;
+  private ObservableList<UserDTO> userList;
 
   /**
    * Initializes the MainController by setting up UI elements, registering event handlers,
@@ -67,6 +67,7 @@ public class MainController {
     root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/main.css")).toExternalForm());
     root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/global.css")).toExternalForm());
     dataHandler = new DataHandler();
+
 
     // Ensure both spacers expand to push elements apart
     HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -89,10 +90,10 @@ public class MainController {
       initialStatusList = dataHandler.getAllStatus();
       initialPriorityList = dataHandler.getAllPriorities();
       taskList = FXCollections.observableArrayList(dataHandler.getAllTasksByHouseHold(household.getId()));
-      initialUserList =  FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId()));
+      userList =  FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId()));
 
       taskTable.setItems(taskList);
-      userTable.setItems(initialUserList);
+      userTable.setItems(userList);
 
       statusColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialStatusList)));
       priorityColumn.setCellValueFactory(cellData ->
@@ -101,13 +102,12 @@ public class MainController {
 
       // Bind the label's text to the size of the list
       userCount.textProperty().bind(
-          Bindings.size(initialUserList).asString()
+          Bindings.size(userList).asString()
       );
       userTable.prefHeightProperty().bind(
-          Bindings.size(initialUserList).multiply(70).add(20)
+          Bindings.size(userList).multiply(70).add(20)
       );
     });
-
 
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
@@ -127,15 +127,6 @@ public class MainController {
 
     searchField.setOnAction(this::handleSearchDescription);
 
-    userTable.setOnMouseClicked(event -> {
-      UserDTO user = userTable.getSelectionModel().getSelectedItem();
-      if (event.getButton() == MouseButton.SECONDARY && user != null) {
-        Logger.info("User clicked: " + user.getName());
-        userClickedMenu(event, user);
-      } else {
-        Logger.info("Another button was clicked: " + event.getButton());
-      }
-    });
     taskTable.setOnMouseClicked(event -> {
       TaskDTO task = taskTable.getSelectionModel().getSelectedItem();
       if (event.getButton() == MouseButton.SECONDARY && task != null) {
@@ -143,48 +134,6 @@ public class MainController {
         taskClickedMenu(event, task);
       }
     });
-  }
-
-  /**
-   * Displays a context menu for user actions such as delete and edit.
-   *
-   * @param event the mouse event triggering the menu
-   * @param user  the user object associated with the event
-   */
-  public void userClickedMenu(MouseEvent event, UserDTO user) {
-    ContextMenu contextMenu = new ContextMenu();
-    contextMenu.setAutoHide(true);
-
-    MenuItem deleteUser = new MenuItem("Delete User");
-    MenuItem editUser = new MenuItem("Edit User");
-    EventHandler<ActionEvent> handler = e -> {
-      if (e.getSource() == deleteUser) {
-        dataHandler.deleteUser(user);
-        userTable.setItems(FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId())));
-      } else if (e.getSource() == editUser) {
-        Optional<UserDTO> result = UserDialogFactory.createEditUserDialog(user, household).showAndWait();
-        result.ifPresent(editedUser -> {
-          dataHandler.editUser(editedUser);
-          userTable.setItems(getAllUsers());
-        });
-      }
-      contextMenu.hide();
-    };
-    deleteUser.setOnAction(handler);
-    editUser.setOnAction(handler);
-    contextMenu.getItems().addAll(deleteUser, editUser);
-
-    EventHandler<MouseEvent> sceneMouseHandler = e -> {
-      if (contextMenu.isShowing()) {
-        contextMenu.hide();
-      }
-    };
-
-    contextMenu.setOnHidden(e -> {
-      userTable.getScene().removeEventFilter(MouseEvent.MOUSE_CLICKED, sceneMouseHandler);
-    });
-    userTable.getScene().addEventFilter(MouseEvent.MOUSE_CLICKED, sceneMouseHandler);
-    contextMenu.show(userTable, event.getScreenX(), event.getScreenY());
   }
 
   /**
@@ -205,7 +154,7 @@ public class MainController {
         taskTable.setItems(FXCollections.observableArrayList(dataHandler.getAllTasksByHouseHold(household.getId())));
       } else if (e.getSource() == editTask) {
         Optional<TaskDTO> result = TaskDialogFactory
-                .createEditTaskDialog(task, household, initialStatusList, initialPriorityList, initialUserList)
+                .createEditTaskDialog(task, household, initialStatusList, initialPriorityList, userList)
                 .showAndWait();
         result.ifPresent(editedTask -> {
           dataHandler.editTask(editedTask);
@@ -267,8 +216,13 @@ public class MainController {
   private void handleAddUser(ActionEvent event) {
     Optional<UserDTO> result = UserDialogFactory.createAddUserDialog(household).showAndWait();
     result.ifPresent(user -> {
-      dataHandler.addUser(user);
-      initialUserList.add(user);
+      Message<Integer> queryResult = dataHandler.addUser(user);
+      if(queryResult.getType() == MessageTypeEnum.SUCCESS){
+        // Set autogenerated id to user
+        user.setId(queryResult.getResult());
+        // Update userList
+        userList.add(user);
+      }
       Logger.info("User added successfully");
     });
   }
@@ -279,7 +233,7 @@ public class MainController {
    * @param event the action event triggered by clicking the add task button
    */
   private void handleAddTask(ActionEvent event) {
-    Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, initialPriorityList, initialUserList)
+    Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, initialPriorityList, userList)
             .showAndWait();
     result.ifPresent(task -> {
       Message<Void> resultMsg = dataHandler.addTask(task);
@@ -331,10 +285,34 @@ public class MainController {
   public void handleUserClicked(UserDTO user) {
     System.out.println("User clicked");
   }
+
   public void handleUserEdit(UserDTO user) {
-    System.out.println("User edited");
+    Optional<UserDTO> result = UserDialogFactory.createEditUserDialog(user, household).showAndWait();
+    result.ifPresent(editedUser -> {
+      dataHandler.editUser(editedUser);
+      userList.replaceAll(u -> u.getId() == editedUser.getId() ? editedUser : u);
+    });
   }
   public void handleUserDelete(UserDTO user) {
-    System.out.println("User deleted");
+    // Create Confirmation Alert
+    Logger.info(String.valueOf(user.getId()));
+    Logger.info(user.getName());
+
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Delete User");
+    alert.setHeaderText("Are you sure you want to delete this user?");
+    alert.setContentText("User: " + user.getName());
+
+    // Show alert and wait for user response
+    Optional<ButtonType> result = alert.showAndWait();
+
+    // Check if user clicked OK
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      dataHandler.deleteUser(user);   // Delete from database
+      userList.remove(user);          // Remove from UI list
+      taskList.setAll(getAllTasks()); // Pull the changes to the tasks
+      taskTable.setItems(taskList);
+    }
+
   }
 }

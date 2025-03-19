@@ -7,7 +7,7 @@
 <BorderPane fx:id="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
 
     <!-- Top Bar -->
-    <top >
+    <top>
         <HBox spacing="10" style="-fx-padding: 20px 30px;" styleClass="top-bar">
             <!-- ABC Logo -->
             <ImageView fitHeight="40" preserveRatio="true">
@@ -42,29 +42,26 @@
 
     <!-- Right Bar -->
     <right>
-        <VBox alignment="TOP_CENTER" spacing="-3" styleClass="right-bar">
-            <!-- Header Section -->
-            <HBox spacing="10" styleClass="user-header-container" alignment="CENTER_LEFT">
-                <Label text="People in household" styleClass="user-header-title"/>
-                <Label fx:id="userCount" styleClass="user-count-label"/>
-            </HBox>
+            <VBox alignment="TOP_CENTER" spacing="-3" styleClass="right-bar" SplitPane.resizableWithParent="true" maxWidth="Infinity">
+                <HBox spacing="10" styleClass="user-header-container" alignment="CENTER_LEFT">
+                    <Label text="People in household" styleClass="user-header-title"/>
+                    <Label fx:id="userCount" styleClass="user-count-label"/>
+                </HBox>
 
-            <!-- ListView for Users -->
-            <VBox maxHeight="1000" VBox.vgrow="NEVER">
-                <ListView fx:id="userTable" styleClass="user-list"/>
+                <VBox VBox.vgrow="ALWAYS">
+                    <ListView fx:id="userTable" styleClass="user-list"/>
+                </VBox>
+
+                <HBox styleClass="add-user-button-container">
+                    <Button fx:id="addUserBtn" text="Add people" styleClass="add-user-button">
+                        <graphic>
+                            <ImageView fitHeight="14" fitWidth="14" nodeOrientation="RIGHT_TO_LEFT">
+                                <Image url="@../icons/plus-icon.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
             </VBox>
-
-            <!-- "Add People" Button -->
-            <HBox styleClass="add-user-button-container">
-                <Button fx:id="addUserBtn" text="Add people" styleClass="add-user-button">
-                    <graphic>
-                        <ImageView fitHeight="14" fitWidth="14" nodeOrientation="RIGHT_TO_LEFT">
-                            <Image url="@../icons/plus-icon.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-            </HBox>
-        </VBox>
     </right>
 
 

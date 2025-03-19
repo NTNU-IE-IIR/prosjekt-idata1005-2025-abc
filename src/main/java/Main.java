@@ -11,6 +11,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        // Enable antialiasing for the text
+        System.setProperty("prism.text", "gray");
+        System.setProperty("prism.lcdtext", "false");
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/login.fxml"));
         Parent root = loader.load();
 

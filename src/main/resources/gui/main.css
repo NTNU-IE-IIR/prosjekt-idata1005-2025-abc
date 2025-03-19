@@ -1,5 +1,8 @@
 .root{
     -fx-background-color: white;
+    -fx-font-family: "Inter";
+    -fx-font-size: 16px;
+    -fx-font-smoothing-type: gray;
 }
 
 .top-bar {
@@ -26,8 +29,8 @@
 .button {
     -fx-background-color: #D6F8FF;
     -fx-text-fill: #333333;
-    -fx-font-family:"Inter 18pt Medium";
-    -fx-font-size: 18px;
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 16px;
     -fx-padding: 0px 15px;
     -fx-min-height: 42px;
     -fx-background-radius: 6px;
@@ -70,7 +73,7 @@
     -fx-background-color: transparent;  /* Removes extra background */
     -fx-padding: 5px;  /* Ensures proper vertical alignment */
     -fx-font-family: "Inter 18pt Medium";
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-min-width: 250px;
 }
 
@@ -116,7 +119,7 @@
 
 .user-count-label{
     -fx-font-family: "Inter 18pt Medium";
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-text-fill: #6A6A6A;
     -fx-background-color: #F6F6F6;
     -fx-background-radius: 12px;
@@ -128,7 +131,8 @@
     -fx-border-color: transparent;
     -fx-text-fill: #4683C0; /* Blue color */
     -fx-font-family: "Inter 18pt Medium";
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
+    -fx-max-width: 210px;
     -fx-underline: true; /* Adds underline */
     -fx-cursor: hand;
 }
@@ -146,7 +150,7 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-text-fill: #333333;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-cursor: hand;
 }
 .add-user-button:hover {
