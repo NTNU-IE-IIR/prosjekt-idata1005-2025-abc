@@ -27,6 +27,9 @@
         </Label>
         <TextField fx:id="usernameField" styleClass="short-text-field" promptText="Username"/>
         <PasswordField fx:id="passwordField" styleClass="short-text-field" promptText="Password"/>
-        <Button onAction="#handleLogin" text="Login" alignment="TOP_RIGHT"/>
+        <HBox spacing="14" alignment="CENTER">
+            <Button onAction="#handleLogin" text="Login"/>
+            <CheckBox fx:id="checkRememberMe" text="Remember me" />
+        </HBox>
     </VBox>
 </VBox>
