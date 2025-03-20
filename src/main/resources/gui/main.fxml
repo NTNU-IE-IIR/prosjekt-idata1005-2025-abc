@@ -19,9 +19,10 @@
                 </ImageView>
                 <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
             </HBox>
-            <HBox fx:id="logoutField" alignment="CENTER_RIGHT">
+            <HBox fx:id="logoutField"  >
                 <Button fx:id="logoutButton" accessibleRole="BUTTON" text="Logout" styleClass = "logout-button">
                <graphic>
+
                       <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
                           <Image url="@../icons/connect-icon.png" />
                       </ImageView>

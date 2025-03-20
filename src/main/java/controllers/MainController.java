@@ -3,19 +3,26 @@ package controllers;
 
 import dbcontext.DataHandler;
 import dto.*;
+import java.io.IOException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import utils.Logger;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javafx.scene.image.ImageView;
+
 
 public class MainController {
 
@@ -28,6 +35,8 @@ public class MainController {
   @FXML private TableColumn<TaskDTO, String> userColumn;
   @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage, logoutButton;
   @FXML private TextField searchField;
+ // @FXML private Button logoutButton;
+  @FXML private ImageView logoutImageView;
 
   private DataHandler dataHandler;
   private HouseholdDTO household;
@@ -55,6 +64,10 @@ public class MainController {
             new javafx.beans.property.SimpleStringProperty(
                     cellData.getValue().getUser() != null ? cellData.getValue().getUser().getName() : "Unassigned"
             ));
+
+    logoutButton.setOnAction(this::handlelogoutButton);
+
+
 
     Platform.runLater(() -> {
       initialStatusList = dataHandler.getAllStatus();
@@ -103,6 +116,23 @@ public class MainController {
       }
     });
   }
+
+  private void handlelogoutButton(ActionEvent event) {
+    try {
+      // Load the login page
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/login.fxml"));
+      Parent loginRoot = loader.load();
+
+      // Get the current stage
+      Stage stage = (Stage) root.getScene().getWindow();
+
+      // Set the new scene
+      Scene scene = new Scene(loginRoot);
+      stage.setScene(scene);
+      stage.setTitle("Login Page");
+    } catch (IOException e) {
+      e.printStackTrace();
+  }}
 
   public void userClickedMenu(MouseEvent event, UserDTO user) {
     ContextMenu contextMenu = new ContextMenu();
