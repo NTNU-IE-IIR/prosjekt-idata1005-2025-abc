@@ -5,28 +5,28 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="root" alignment="CENTER" prefHeight="353.0" prefWidth="575.0" spacing="5" styleClass="login-container" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
-    <HBox alignment="TOP_CENTER" prefHeight="45.0" prefWidth="427.0">
-        <Label alignment="CENTER" text="Household Organization and Management Engine">
-           <font>
-               <Font name="Inter Semi Bold" size="22.0"/>
-           </font>
+<VBox fx:id="root" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20" styleClass="login-container"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
+    <VBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="600.0">
+        <Label alignment="CENTER" text="Welcome to HOME" styleClass="title-label">
+            <font>
+                <Font name="Inter Semi Bold" size="18.0"/>
+            </font>
         </Label>
-    </HBox>
-
-    <VBox prefHeight="200.0" prefWidth="100.0" spacing="14" style="-fx-max-width: 300;">
-        <Label text="Connect to a household">
-          <font>
-              <Font name="Inter Semi Bold" size="18.0"/>
-          </font>
+        <Label alignment="CENTER" text="Household Organization and Management Engine" styleClass="title-label">
+            <font>
+                <Font name="Inter Semi Bold" size="14.0"/>
+            </font>
         </Label>
-        <TextField fx:id="usernameField" prefWidth="306.0" promptText="Username"/>
-        <PasswordField fx:id="passwordField" promptText="Password"/>
-
-        <HBox spacing="14" alignment="CENTER_LEFT">
-            <Button onAction="#handleLogin" text="Login"/>
-            <CheckBox fx:id="checkRememberMe" text="Remember me" />
-        </HBox>
     </VBox>
-
+    <VBox prefHeight="200.0" prefWidth="300.0" spacing="14" alignment="CENTER">
+        <Label text="Connect to a household">
+            <font>
+                <Font name="Inter Semi Bold" size="18.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="usernameField" styleClass="short-text-field" promptText="Username"/>
+        <PasswordField fx:id="passwordField" styleClass="short-text-field" promptText="Password"/>
+        <Button onAction="#handleLogin" text="Login" alignment="TOP_RIGHT"/>
+    </VBox>
 </VBox>
