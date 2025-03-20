@@ -100,15 +100,19 @@
                     </graphic>
                 </Button>
             </HBox>
-
-            <TableView fx:id="taskTable" styleClass="task-table">
-                <columns>
-                    <TableColumn fx:id="descriptionColumn" text="Description" />
-                    <TableColumn fx:id="statusColumn" text="Status" />
-                    <TableColumn fx:id="priorityColumn" text="Priority" />
-                    <TableColumn fx:id="userColumn" text="User" />
-                </columns>
-            </TableView>
+            <!-- ▲▼ -->
+            <VBox VBox.vgrow="ALWAYS">
+                <HBox>
+                    <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick">Description</Label>
+                    <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick">Status</Label>
+                    <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick">Priority</Label>
+                    <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick">Owner</Label>
+                </HBox>
+                <ListView fx:id="taskTable" styleClass="task-list" />
+            </VBox>
+            <HBox>
+                <Label>Footer</Label>
+            </HBox>
         </VBox>
 
     </center>

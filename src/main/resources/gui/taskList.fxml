@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox  fx:id="container" spacing="10" alignment="CENTER_LEFT" xmlns="http://javafx.com/javafx"
+       xmlns:fx="http://javafx.com/fxml" styleClass="task-wrapper">
+
+    <HBox styleClass="task-element-wrapper, task-element-description">
+        <Label fx:id="taskDescription"></Label>
+    </HBox>
+
+    <HBox styleClass="task-element-wrapper, task-element-status">
+        <ComboBox fx:id="taskStatusDropdown" />
+    </HBox>
+
+    <HBox styleClass="task-element-wrapper, task-element-priority">
+        <ComboBox fx:id="taskPriorityDropdown" />
+    </HBox>
+
+    <HBox styleClass="task-element-wrapper, task-element-owner">
+        <ComboBox fx:id="taskOwnerDropdown" />
+    </HBox>
+
+    <Label fx:id="taskPriority"></Label>
+    <Label fx:id="taskStatus"></Label>
+    <Label fx:id="taskOwner"></Label>
+
+</HBox>

@@ -140,6 +140,17 @@ public class TaskDTO {
   }
 
   /**
+   * Returns the name of the assigned user.
+   *
+   * @return the username or null if not set
+   */
+  public String getUserName() {
+    if(user != null)
+      return user.getName();
+    return null;
+  }
+
+  /**
    * Updates the task status.
    *
    * @param status the new status for the task
@@ -156,4 +167,21 @@ public class TaskDTO {
   public void setPriority(PriorityDTO priority) {
     this.priority = priority;
   }
+
+  public void setUser(UserDTO user) {
+    this.user = user;
+  }
+
+  @Override
+  public String toString() {
+    return "TaskDTO{" +
+      "id=" + id +
+      ", description='" + description + '\'' +
+      ", householdId=" + (household != null ? household.getId() : "N/A") +
+      ", status=" + (status != null ? status.getName() : "N/A") +
+      ", priority=" + (priority != null ? priority.getName() : "N/A") +
+      ", user=" + (user != null ? user.getName() : "Unassigned") +
+      '}';
+  }
+
 }

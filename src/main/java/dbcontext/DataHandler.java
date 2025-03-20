@@ -249,10 +249,23 @@ public class DataHandler {
     }
 
     public Message<List<TaskDTO>> getUserTasks(UserDTO user) {
-        String query ="SELECT * FROM tasks WHERE ownerId = ?";
+        String query ="SELECT " +
+          "t.id, t.description, " +
+          "h.id AS household_id, h.name AS household_name, " +
+          "s.id AS status_id, s.name AS status_name, " +
+          "p.id AS priority_id, p.name AS priority_name, " +
+          "u.id AS user_id, u.name AS user_name " +
+          "FROM tasks t " +
+          "LEFT JOIN households h ON t.householdId = h.id " +
+          "LEFT JOIN status s ON t.statusId = s.id " +
+          "LEFT JOIN priorities p ON t.priorityId = p.id " +
+          "LEFT JOIN users u ON t.ownerId = u.id " +
+          "WHERE t.householdId = ? AND u.id = ? " +
+          "ORDER BY t.id DESC";
+
         Message<List<TaskDTO>> message;
         try {
-            List<TaskDTO> result = dbHelper.executeSelect(query, TaskDTO.class, user.getId());
+            List<TaskDTO> result = dbHelper.executeSelect(query, TaskDTO.class,user.getHousehold().getId(), user.getId());
             message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully viewing tasks for: "+user.getName(), result);
         }
         catch (SQLException e) {

@@ -168,3 +168,57 @@
 .icon-button:hover{
     -fx-background-color:#DEDEDE;
 }
+
+.task-list{
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.task-list:focused {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.task-list .list-cell{
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 12px 8px;
+}
+
+.task-list .list-cell:filled:selected,
+.task-list .list-cell:filled:selected:hover {
+    -fx-background-color: transparent;
+}
+
+.task-wrapper Label {
+    -fx-text-fill: black; /* Ensures labels inside the HBox remain visible */
+}
+
+.task-list .list-cell:filled:selected .task-wrapper Label {
+    -fx-text-fill: black; /* Override the default selection text color */
+}
+
+.task-element-wrapper{
+    -fx-background-color:#F6F6F6 ;
+}
+
+.task-element-description{
+    -fx-pref-width: 500px;
+}
+
+.task-element-status{
+    -fx-pref-width: 200px;
+}
+
+.task-element-priority{
+    -fx-pref-width: 150px;
+}
+
+.task-element-owner{
+    -fx-pref-width: 300px;
+}
+

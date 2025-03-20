@@ -1,6 +1,7 @@
 // Language: java
 package controllers;
 
+import controllers.helpers.TaskListController;
 import controllers.helpers.UserListCellController;
 import dbcontext.DataHandler;
 import dto.*;
@@ -18,17 +19,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseButton;
+import java.util.function.Function;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import jdk.jfr.Description;
 import utils.Logger;
 import utils.Message;
 import utils.MessageTypeEnum;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * The MainController class manages the primary UI interactions including handling tasks,
@@ -38,7 +39,7 @@ import java.util.Optional;
 public class MainController {
 
   @FXML private BorderPane root;
-  @FXML private TableView<TaskDTO> taskTable;
+  @FXML private ListView<TaskDTO> taskTable;
   @FXML private ListView<UserDTO> userTable;
   @FXML private TableColumn<TaskDTO, String> descriptionColumn;
   @FXML private TableColumn<TaskDTO, StatusDTO> statusColumn;
@@ -47,6 +48,8 @@ public class MainController {
   @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage, logoutButton;
   @FXML private TextField searchField;
   @FXML private Label userCount;
+  @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
+
 
   @FXML private Region spacer;  // Reference to the first spacer
   @FXML private Region spacer2; // Reference to the second spacer
@@ -54,9 +57,11 @@ public class MainController {
   private DataHandler dataHandler;
   private HouseholdDTO household;
   private ObservableList<TaskDTO> taskList;
-  private List<StatusDTO> initialStatusList;
-  private List<PriorityDTO> initialPriorityList;
+  private ObservableList<StatusDTO> statusList;
+  private ObservableList<PriorityDTO> priorityList;
   private ObservableList<UserDTO> userList;
+  private Label lastClickedTaskOrder = null;
+
 
   /**
    * Initializes the MainController by setting up UI elements, registering event handlers,
@@ -73,32 +78,22 @@ public class MainController {
     HBox.setHgrow(spacer, Priority.ALWAYS);
     HBox.setHgrow(spacer2, Priority.ALWAYS);
 
-    taskTable.setEditable(true);
-    descriptionColumn.setCellValueFactory(cellData ->
-            new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescription()));
-    statusColumn.setCellValueFactory(cellData ->
-            new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getStatus()));
-    userColumn.setCellValueFactory(cellData ->
-            new javafx.beans.property.SimpleStringProperty(
-                    cellData.getValue().getUser() != null ? cellData.getValue().getUser().getName() : "Unassigned"
-            ));
+    userTable.setFixedCellSize(60);
+    taskTable.setCellFactory(param ->
+      new TaskListController(statusList, priorityList, userList, household, this::handleEditTask));
 
     userTable.setFixedCellSize(70);
-    userTable.setCellFactory(param -> new UserListCellController(this::handleUserClicked, this::handleUserEdit, this::handleUserDelete));
+    userTable.setCellFactory(param ->
+      new UserListCellController(this::handleUserClicked, this::handleUserEdit, this::handleUserDelete));
 
     Platform.runLater(() -> {
-      initialStatusList = dataHandler.getAllStatus();
-      initialPriorityList = dataHandler.getAllPriorities();
+      statusList = FXCollections.observableArrayList(dataHandler.getAllStatus());
+      priorityList = FXCollections.observableArrayList(dataHandler.getAllPriorities());
       taskList = FXCollections.observableArrayList(dataHandler.getAllTasksByHouseHold(household.getId()));
       userList =  FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId()));
 
       taskTable.setItems(taskList);
       userTable.setItems(userList);
-
-      statusColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialStatusList)));
-      priorityColumn.setCellValueFactory(cellData ->
-              new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getPriority()));
-      priorityColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(initialPriorityList)));
 
       // Bind the label's text to the size of the list
       userCount.textProperty().bind(
@@ -107,77 +102,123 @@ public class MainController {
       userTable.prefHeightProperty().bind(
           Bindings.size(userList).multiply(70).add(20)
       );
+      taskTable.prefHeightProperty().bind(
+        Bindings.size(taskList).multiply(60).add(100)
+      );
+
     });
 
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
     closeDoneBtn.setOnAction(e -> Logger.info("Close done tasks clicked!"));
     addUserBtn.setOnAction(this::handleAddUser);
-
-    statusColumn.setOnEditCommit(event -> {
-      TaskDTO task = event.getRowValue();
-      task.setStatus(event.getNewValue());
-      dataHandler.updateTask(task);
-    });
-    priorityColumn.setOnEditCommit(event -> {
-      TaskDTO task = event.getRowValue();
-      task.setPriority(event.getNewValue());
-      dataHandler.updateTask(task);
-    });
-
     searchField.setOnAction(this::handleSearchDescription);
+  }
 
-    taskTable.setOnMouseClicked(event -> {
-      TaskDTO task = taskTable.getSelectionModel().getSelectedItem();
-      if (event.getButton() == MouseButton.SECONDARY && task != null) {
-        Logger.info("Task clicked: " + task.getDescription());
-        taskClickedMenu(event, task);
-      }
-    });
+  @FXML
+  private void handleSortClick(MouseEvent event) {
+    Label clickedLabel = (Label) event.getSource();
+    String currentSort = clickedLabel.getId();
+
+    // Detect if the user clicked the same label twice (-> reverse sort).
+    boolean reverse = clickedLabel.equals(lastClickedTaskOrder);
+
+    // Remove any existing "▲"/"▼" indicators from labels before applying a new one.
+    resetSortLabels();
+
+    // Map each label ID to its corresponding sort method.
+    Map<String, Runnable> sortActions = Map.of(
+      "sortTaskDescription", () -> sortTaskDescription(reverse),
+      "sortTaskStatus", () -> sortTaskStatus(reverse),
+      "sortTaskPriority", () -> sortTaskPriority(reverse),
+      "sortTaskOwner", () -> sortTaskOwner(reverse)
+    );
+
+    // Run the sort function for the clicked label, if present.
+    sortActions.getOrDefault(currentSort, () -> {}).run();
+
+    // Update the clicked label with the appropriate arrow.
+    clickedLabel.setText(getLabelText(clickedLabel.getText(), reverse));
+
+    // Update lastClickedTaskOrder: set it to null if the user clicked the same label again
+    // (meaning next time it will do normal sort), or set it to this label otherwise.
+    lastClickedTaskOrder = reverse ? null : clickedLabel;
   }
 
   /**
-   * Displays a context menu for task actions such as delete and edit.
-   *
-   * @param event the mouse event triggering the menu
-   * @param task  the task object associated with the event
+   * Removes "▲" and "▼" from all labels to reset their displayed state.
    */
-  public void taskClickedMenu(MouseEvent event, TaskDTO task) {
-    ContextMenu contextMenu = new ContextMenu();
-    contextMenu.setAutoHide(true);
+  private void resetSortLabels() {
+    List<Label> sortLabels = List.of(sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner);
+    sortLabels.forEach(label -> label.setText(label.getText()
+      .replace(" ▲", "")
+      .replace(" ▼", "")
+    ));
+  }
 
-    MenuItem deleteTask = new MenuItem("Delete Task");
-    MenuItem editTask = new MenuItem("Edit Task");
-    EventHandler<ActionEvent> handler = e -> {
-      if (e.getSource() == deleteTask) {
-        dataHandler.deleteTask(task);
-        taskTable.setItems(FXCollections.observableArrayList(dataHandler.getAllTasksByHouseHold(household.getId())));
-      } else if (e.getSource() == editTask) {
-        Optional<TaskDTO> result = TaskDialogFactory
-                .createEditTaskDialog(task, household, initialStatusList, initialPriorityList, userList)
-                .showAndWait();
-        result.ifPresent(editedTask -> {
-          dataHandler.editTask(editedTask);
-          taskTable.setItems(getAllTasks());
-        });
-      }
-      contextMenu.hide();
-    };
+  /**
+   * Appends an up or down arrow, depending on the sort order (reverse or not).
+   */
+  private String getLabelText(String baseText, boolean reverse) {
+    // Remove old arrows just in case
+    baseText = baseText.replace(" ▲", "").replace(" ▼", "");
+    return baseText + (reverse ? " ▲" : " ▼");
+  }
 
-    deleteTask.setOnAction(handler);
-    editTask.setOnAction(handler);
-    contextMenu.getItems().addAll(deleteTask, editTask);
+  /**
+   * A generic helper to apply the same sorting logic for different fields.
+   * @param keyExtractor  function to get the field from TaskDTO (e.g., TaskDTO::getStatus).
+   * @param keyComparator comparator for that field (e.g., Comparator.nullsLast(…)).
+   * @param reverse       true for reversed sort order, false otherwise.
+   */
+  private <T> void sortTaskList(Function<TaskDTO, T> keyExtractor,
+                                Comparator<? super T> keyComparator,
+                                boolean reverse) {
 
-    EventHandler<MouseEvent> sceneMouseHandler = e -> {
-      if (contextMenu.isShowing()) {
-        contextMenu.hide();
-      }
-    };
-    contextMenu.setOnHidden(e -> {
-      taskTable.getScene().removeEventFilter(MouseEvent.MOUSE_CLICKED, sceneMouseHandler);
-    });
-    taskTable.getScene().addEventFilter(MouseEvent.MOUSE_CLICKED, sceneMouseHandler);
-    contextMenu.show(taskTable, event.getScreenX(), event.getScreenY());
+    Comparator<TaskDTO> comparator = Comparator.comparing(keyExtractor, keyComparator);
+    if (reverse) {
+      comparator = comparator.reversed();
+    }
+    taskList.sort(comparator);
+  }
+
+  private void sortTaskOwner(boolean reverse) {
+    sortTaskList(
+      TaskDTO::getUser,
+      Comparator.nullsLast(
+        Comparator.comparing(UserDTO::getName, String.CASE_INSENSITIVE_ORDER)
+      ),
+      reverse
+    );
+  }
+
+  private void sortTaskStatus(boolean reverse) {
+    sortTaskList(
+      TaskDTO::getStatus,
+      Comparator.nullsLast(
+        Comparator.comparing(StatusDTO::getName, String.CASE_INSENSITIVE_ORDER)
+      ),
+      reverse
+    );
+  }
+
+  private void sortTaskPriority(boolean reverse) {
+    sortTaskList(
+      TaskDTO::getPriority,
+      Comparator.nullsLast(
+        Comparator.comparing(PriorityDTO::getName, String.CASE_INSENSITIVE_ORDER)
+      ),
+      reverse
+    );
+  }
+
+  private void sortTaskDescription(boolean reverse) {
+    // For simple String fields (no null checks needed in your example):
+    sortTaskList(
+      TaskDTO::getDescription,
+      String.CASE_INSENSITIVE_ORDER,
+      reverse
+    );
   }
 
   /**
@@ -233,7 +274,7 @@ public class MainController {
    * @param event the action event triggered by clicking the add task button
    */
   private void handleAddTask(ActionEvent event) {
-    Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, initialPriorityList, userList)
+    Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, priorityList, userList)
             .showAndWait();
     result.ifPresent(task -> {
       Message<Void> resultMsg = dataHandler.addTask(task);
@@ -245,6 +286,14 @@ public class MainController {
         taskList.add(task);
       }
     });
+  }
+
+  public void handleEditTask(TaskDTO task) {
+    dataHandler.editTask(task); // TODO error handling
+
+    List<TaskDTO> updatedList = new ArrayList<>(taskList);
+    updatedList.replaceAll(t -> t.getId() == task.getId() ? task : t);
+    taskList.setAll(updatedList); // Triggers UI refresh
   }
 
   /**
@@ -283,14 +332,24 @@ public class MainController {
   }
 
   public void handleUserClicked(UserDTO user) {
-    System.out.println("User clicked");
+    Message<List<TaskDTO>> queryResult = dataHandler.getUserTasks(user);
+
+    if(queryResult.getType() == MessageTypeEnum.ERROR){
+      Logger.error(queryResult.getMessage());
+      return;
+    }
+    taskList.setAll(queryResult.getResult());
+    taskTable.refresh(); // Forces UI refresh
   }
 
   public void handleUserEdit(UserDTO user) {
     Optional<UserDTO> result = UserDialogFactory.createEditUserDialog(user, household).showAndWait();
     result.ifPresent(editedUser -> {
-      dataHandler.editUser(editedUser);
-      userList.replaceAll(u -> u.getId() == editedUser.getId() ? editedUser : u);
+      dataHandler.editUser(editedUser); // TODO error handling
+
+      List<UserDTO> updatedList = new ArrayList<>(userList);
+      updatedList.replaceAll(u -> u.getId() == editedUser.getId() ? editedUser : u);
+      userList.setAll(updatedList);
     });
   }
   public void handleUserDelete(UserDTO user) {
