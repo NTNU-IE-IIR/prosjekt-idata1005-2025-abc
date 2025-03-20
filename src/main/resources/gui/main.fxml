@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="top-bar">
+            <Button fx:id="addTaskBtn" text="Add new task" />
+            <Button fx:id="distributeBtn" text="Distribute all tasks" />
+            <Button fx:id="closeDoneBtn" text="Close done tasks" />
+
+            <HBox fx:id="searchContainer" alignment="CENTER_LEFT" styleClass="search-container">
+                <ImageView fitHeight="17" fitWidth="17">
+                    <Image url="@../icons/search-icon.png" />
+                </ImageView>
+                <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
+            </HBox>
+            <HBox fx:id="logoutField" alignment="CENTER_RIGHT">
+                <Button fx:id="logoutButton" accessibleRole="BUTTON" text="Logout" styleClass = "logout-button">
+               <graphic>
+                      <ImageView fitHeight="17" fitWidth="17" nodeOrientation="RIGHT_TO_LEFT">
+                          <Image url="@../icons/connect-icon.png" />
+                      </ImageView>
+               </graphic></Button>
+            </HBox>
+
+        </HBox>
+    </top>
+
+    <!-- Right Bar -->
+    <right>
+        <VBox alignment="TOP_CENTER" spacing="15">
+            <Button fx:id="addUserBtn" text="Add people" />
+            <ListView fx:id="userTable" prefHeight="267.0" prefWidth="248.0" />
+        </VBox>
+
+    </right>
+
+    <!-- Table (Center) -->
+    <center>
+        <TableView fx:id="taskTable" styleClass="task-table">
+            <columns>
+                <TableColumn fx:id="descriptionColumn" text="Description" />
+                <TableColumn fx:id="statusColumn" text="Status" />
+                <TableColumn fx:id="priorityColumn" text="Priority" />
+                <TableColumn fx:id="userColumn" text="User" />
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Button fx:id="previousTaskPage" text="Previous page" />
+            <Button fx:id="nextTaskPage" text="Next page" />
+        </HBox>
+    </bottom>
+</BorderPane>

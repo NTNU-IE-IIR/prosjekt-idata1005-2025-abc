@@ -1,0 +1,57 @@
+.root {
+    -fx-background-color: linear-gradient(to bottom, #83a4d4, #b6fbff);
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+
+.login-container {
+    -fx-background-color: #ffffff;
+    -fx-padding: 30px;
+    -fx-spacing: 15px;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 0);
+}
+
+
+.label {
+    -fx-font-size: 28px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+
+.text-field, .password-field {
+    -fx-pref-width: 300px;
+    -fx-padding: 10px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 16px;
+}
+
+
+.button {
+    -fx-background-color: #007ACC;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #005999;
+}
+
+
+.error-label {
+    -fx-background-color: #ffcccc;
+    -fx-text-fill: #a00;
+    -fx-padding: 10px;
+    -fx-border-color: #a00;
+    -fx-border-width: 1px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
