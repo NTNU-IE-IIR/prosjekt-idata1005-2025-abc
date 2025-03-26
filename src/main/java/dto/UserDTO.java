@@ -3,7 +3,7 @@ package dto;
 /**
  * Represents a user with an id, name, and associated household.
  */
-public class UserDTO {
+public class UserDTO implements SelectOption {
   private int id;
   private String name;
   private HouseholdDTO household;

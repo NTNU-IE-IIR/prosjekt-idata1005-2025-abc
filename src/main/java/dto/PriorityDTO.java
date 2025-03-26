@@ -4,7 +4,7 @@ package dto;
  * Represents a task priority.
  * Contains an identifier and a name for the priority.
  */
-public class PriorityDTO {
+public class PriorityDTO implements SelectOption {
   private int id;
   private String name;
 

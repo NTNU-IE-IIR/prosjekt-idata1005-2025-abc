@@ -67,54 +67,59 @@
 
     <!-- Table (Center) -->
     <center>
-        <VBox>
-            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="tool-bar">
-                <HBox alignment="CENTER_LEFT" styleClass="search-container">
-                    <ImageView fitHeight="17" preserveRatio="true">
-                        <Image url="@../icons/search-icon.png" />
-                    </ImageView>
-                    <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
-                </HBox>
-
-                <Button fx:id="addTaskBtn" text="Add new task" alignment="CENTER">
-                    <graphic>
+        <HBox alignment="CENTER_RIGHT">
+            <VBox>
+                <!-- Toolbar -->
+                <HBox alignment="CENTER_LEFT" spacing="15" styleClass="tool-bar">
+                    <HBox alignment="CENTER_LEFT" styleClass="search-container">
                         <ImageView fitHeight="17" preserveRatio="true">
-                            <Image url="@../icons/plus-icon.png" />
+                            <Image url="@../icons/search-icon.png" />
                         </ImageView>
-                    </graphic>
-                </Button>
+                        <TextField fx:id="searchField" promptText="Search in description" styleClass="search-field" />
+                    </HBox>
 
-                <Button fx:id="distributeBtn" text="Distribute all tasks">
-                    <graphic>
-                        <ImageView fitHeight="14" preserveRatio="true">
-                            <Image url="@../icons/auto-distribute-icon.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                    <Button fx:id="addTaskBtn" text="Add new task" alignment="CENTER">
+                        <graphic>
+                            <ImageView fitHeight="17" preserveRatio="true">
+                                <Image url="@../icons/plus-icon.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
-                <Button fx:id="closeDoneBtn" text="Close done tasks">
-                    <graphic>
-                        <ImageView fitHeight="14" preserveRatio="true">
-                            <Image url="@../icons/double-check-icon.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-            </HBox>
-            <!-- ▲▼ -->
-            <VBox VBox.vgrow="ALWAYS">
-                <HBox>
-                    <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick">Description</Label>
-                    <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick">Status</Label>
-                    <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick">Priority</Label>
-                    <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick">Owner</Label>
+                    <Button fx:id="distributeBtn" text="Distribute all tasks">
+                        <graphic>
+                            <ImageView fitHeight="14" preserveRatio="true">
+                                <Image url="@../icons/auto-distribute-icon.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                    <Button fx:id="closeDoneBtn" text="Close done tasks">
+                        <graphic>
+                            <ImageView fitHeight="14" preserveRatio="true">
+                                <Image url="@../icons/double-check-icon.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
                 </HBox>
-                <ListView fx:id="taskTable" styleClass="task-list" />
-            </VBox>
-            <HBox>
-                <Label>Footer</Label>
-            </HBox>
-        </VBox>
 
+                <!-- Task list -->
+                <VBox VBox.vgrow="ALWAYS">
+                    <HBox spacing="10" styleClass="sort-order">
+                        <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick" prefWidth="500">Description</Label>
+                        <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick" prefWidth="180">Status</Label>
+                        <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick" prefWidth="140">Priority</Label>
+                        <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick" prefWidth="240">Owner</Label>
+                    </HBox>
+                    <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" prefWidth="1230"   />
+                </VBox>
+
+                <!-- Footer -->
+                <HBox>
+                    <Label>Footer</Label>
+                </HBox>
+            </VBox>
+        </HBox>
     </center>
 
 </BorderPane>

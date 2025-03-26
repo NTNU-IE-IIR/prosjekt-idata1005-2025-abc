@@ -22,3 +22,69 @@
     src: url("/fonts/Inter_28pt-SemiBold.ttf");
 }
 
+/***********************************************************
+ * Basic scrollbar customization
+ ***********************************************************/
+
+/* General ScrollBar styling (applies to both vertical and horizontal) */
+.scroll-bar {
+    -fx-background-color: transparent; /* Remove default background */
+}
+
+/* For a vertical scrollbar */
+.scroll-bar:vertical {
+    -fx-pref-width: 13px; /* Width of the vertical bar */
+}
+
+/* The 'track' is the background area of the scrollbar */
+.scroll-bar:vertical .track {
+    -fx-background-color: #f0f0f0;  /* Light gray track */
+    -fx-background-radius: 4px;     /* Rounded corners */
+}
+
+/* The 'thumb' is the draggable part of the scrollbar */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #C7C7C7;  /* Darker gray thumb */
+    -fx-background-radius: 6px;     /* Rounded corners */
+}
+
+/* Optional: hover effect for the thumb */
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #888888;  /* Slightly darker on hover */
+}
+
+/* If you want to hide increment/decrement buttons or style them: */
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+}
+
+/***********************************************************
+ * Similarly, for a horizontal scrollbar:
+ ***********************************************************/
+.scroll-bar:horizontal {
+    -fx-pref-height: 13px; /* Height of the horizontal bar */
+}
+
+.scroll-bar:horizontal .track {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 6px;
+}
+
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #C7C7C7;
+    -fx-background-radius: 6px;
+}
+
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #888888;
+}
+
+.scroll-bar:horizontal .increment-button,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+}
+
+
+
+

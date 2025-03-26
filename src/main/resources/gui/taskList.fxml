@@ -6,27 +6,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox  fx:id="container" spacing="10" alignment="CENTER_LEFT" xmlns="http://javafx.com/javafx"
-       xmlns:fx="http://javafx.com/fxml" styleClass="task-wrapper">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<HBox fx:id="container" spacing="10"  xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml" styleClass="task-wrapper">
 
-    <HBox styleClass="task-element-wrapper, task-element-description">
-        <Label fx:id="taskDescription"></Label>
+    <HBox fx:id="taskDescriptionContainer" styleClass="task-element-wrapper, task-element-description" alignment="CENTER_LEFT">
+        <Label fx:id="taskDescription" />
     </HBox>
 
-    <HBox styleClass="task-element-wrapper, task-element-status">
-        <ComboBox fx:id="taskStatusDropdown" />
-    </HBox>
+    <ComboBox fx:id="taskStatusDropdown" styleClass="task-dropdown, task-status" />
 
-    <HBox styleClass="task-element-wrapper, task-element-priority">
-        <ComboBox fx:id="taskPriorityDropdown" />
-    </HBox>
+    <ComboBox fx:id="taskPriorityDropdown" styleClass="task-dropdown, task-priority"/>
 
-    <HBox styleClass="task-element-wrapper, task-element-owner">
-        <ComboBox fx:id="taskOwnerDropdown" />
-    </HBox>
+    <ComboBox fx:id="taskOwnerDropdown" styleClass="task-dropdown, task-owner" />
 
-    <Label fx:id="taskPriority"></Label>
-    <Label fx:id="taskStatus"></Label>
-    <Label fx:id="taskOwner"></Label>
-
+    <Button fx:id="deleteTaskButton" styleClass="task-icon-button" prefHeight="46">
+        <graphic>
+            <ImageView fitHeight="20" preserveRatio="true">
+                <Image url="@../icons/delete-icon.png" />
+            </ImageView>
+        </graphic>
+    </Button>
 </HBox>

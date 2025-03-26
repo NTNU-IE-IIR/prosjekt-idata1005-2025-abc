@@ -1,10 +1,12 @@
 package dto;
 
+import java.io.Serializable;
+
 /**
  * Represents a task status.
  * Contains an identifier and a name for the status.
  */
-public class StatusDTO {
+public class StatusDTO implements SelectOption {
   private int id;
   private String name;
 

@@ -277,6 +277,7 @@ public class MainController {
     Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, priorityList, userList)
             .showAndWait();
     result.ifPresent(task -> {
+      task.setStatus(new StatusDTO(3, "Not started"));
       Message<Void> resultMsg = dataHandler.addTask(task);
       if(resultMsg.getType() == MessageTypeEnum.ERROR){
         Logger.error(resultMsg.getMessage());

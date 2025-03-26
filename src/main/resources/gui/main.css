@@ -20,8 +20,9 @@
 }
 
 .tool-bar{
-    -fx-padding: 15px;
-    -fx-background-color: white;
+    -fx-background-color: transparent;
+    -fx-padding: 18px 0;
+    -fx-border-insets: 0 82px 0 10px;
     -fx-border-color: transparent transparent #F6F6F6 transparent;
     -fx-border-width: 0 0 3px 0;
 }
@@ -31,8 +32,8 @@
     -fx-text-fill: #333333;
     -fx-font-family: "Inter 18pt Medium";
     -fx-font-size: 16px;
-    -fx-padding: 0px 15px;
-    -fx-min-height: 42px;
+    -fx-padding: 0px 12px;
+    -fx-min-height: 38px;
     -fx-background-radius: 6px;
     -fx-cursor: hand;
 }
@@ -51,7 +52,7 @@
     -fx-border-width: 2px;
     -fx-border-color: #333333;
     -fx-border-radius: 6px;
-    -fx-padding: 3px 10px;
+    -fx-padding: 0px 10px;
     -fx-background-color: white;
 }
 
@@ -194,12 +195,29 @@
     -fx-background-color: transparent;
 }
 
-.task-wrapper Label {
-    -fx-text-fill: black; /* Ensures labels inside the HBox remain visible */
-}
+
 
 .task-list .list-cell:filled:selected .task-wrapper Label {
-    -fx-text-fill: black; /* Override the default selection text color */
+    -fx-text-fill: #333333; /* Override the default selection text color */
+}
+
+.task-wrapper Label {
+    -fx-text-fill: #333333; /* Ensures labels inside the HBox remain visible */
+}
+
+.task-dropdown {
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 16px;
+    -fx-text-fill: #333333;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+}
+
+.task-dropdown:focused {
+    -fx-focus-color: transparent;       /* Removes the solid focus color */
+    -fx-faint-focus-color: transparent; /* Removes the faint focus glow */
 }
 
 .task-element-wrapper{
@@ -208,17 +226,56 @@
 
 .task-element-description{
     -fx-pref-width: 500px;
+    -fx-border-width: 0 0 0 4px;
+    -fx-border-color: #C7C7C7;
+    -fx-padding: 0 0 0 10px;
+}
+.task-element-description .label{
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 16px;
+    -fx-text-fill: #333333;
 }
 
-.task-element-status{
-    -fx-pref-width: 200px;
+.task-status{
+    -fx-pref-width: 180px;
+}
+.task-priority{
+    -fx-pref-width: 140px;
+}
+.task-owner{
+    -fx-pref-width: 240px;
 }
 
-.task-element-priority{
-    -fx-pref-width: 150px;
+.task-icon-button{
+    -fx-background-color: #F6F6F6;
+    -fx-background-radius: 0;
 }
 
-.task-element-owner{
-    -fx-pref-width: 300px;
+.task-icon-button:hover{
+    -fx-background-color:#DEDEDE;
 }
 
+.sort-order{
+    -fx-border-width: 0 0 2px 0;
+    -fx-padding: 14px 0 14px 4px;
+    -fx-border-color: transparent transparent #F6F6F6 transparent;
+    -fx-border-insets: 0 82px 0 10px;
+
+}
+.sort-order .label{
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 18px;
+    -fx-text-fill: #333333;
+}
+
+/* Remove focus styling from the ListView and some of its internals */
+#taskTable,
+#taskTable:focused,
+#taskTable .virtual-flow,
+#taskTable .clipped-container {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-effect: none;
+    -fx-background-insets: 0;
+}
