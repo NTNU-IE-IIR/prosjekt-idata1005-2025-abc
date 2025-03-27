@@ -1,4 +1,4 @@
-package controllers;
+package gui;
 
 import dbcontext.DataHandler;
 import dto.HouseholdDTO;
@@ -12,7 +12,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import utils.HashUtil;
@@ -20,9 +19,8 @@ import utils.Message;
 import utils.MessageTypeEnum;
 import utils.PreferenceUtil;
 import javafx.stage.Screen;
-import java.lang.runtime.SwitchBootstraps;
+
 import java.util.Objects;
-import java.util.prefs.Preferences;
 
 public class LoginController {
 
@@ -38,7 +36,7 @@ public class LoginController {
     // Db context
     dataHandler = new DataHandler();
     // Load CSS file
-    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/login.css")).toExternalForm());
+    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/styles/login.css")).toExternalForm());
 
     // Initialize preferences
     prefUtil = new PreferenceUtil(this.getClass().getName());
@@ -84,7 +82,7 @@ public class LoginController {
   private void loginSuccess(ActionEvent event, HouseholdDTO household) {
     try {
       // Load MainApp FXML
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main.fxml"));
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Main.fxml"));
       Parent root = loader.load(); // Load the FXML first
 
       // Get the MainController instance and pass the household object

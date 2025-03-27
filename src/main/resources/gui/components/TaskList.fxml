@@ -24,7 +24,7 @@
     <Button fx:id="deleteTaskButton" styleClass="task-icon-button" prefHeight="46">
         <graphic>
             <ImageView fitHeight="20" preserveRatio="true">
-                <Image url="@../icons/delete-icon.png" />
+                <Image url="@../../icons/delete-icon.png" />
             </ImageView>
         </graphic>
     </Button>

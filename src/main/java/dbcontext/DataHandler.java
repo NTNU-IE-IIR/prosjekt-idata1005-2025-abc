@@ -266,7 +266,7 @@ public class DataHandler {
         Message<List<TaskDTO>> message;
         try {
             List<TaskDTO> result = dbHelper.executeSelect(query, TaskDTO.class,user.getHousehold().getId(), user.getId());
-            message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully viewing tasks for: "+user.getName(), result);
+            message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully viewing tasks for "+user.getName(), result);
         }
         catch (SQLException e) {
             message = new Message<>(MessageTypeEnum.ERROR, "Internal server error: " + e.getMessage());

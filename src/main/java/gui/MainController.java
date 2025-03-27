@@ -1,29 +1,29 @@
 // Language: java
-package controllers;
+package gui;
 
-import controllers.helpers.TaskListController;
-import controllers.helpers.UserListCellController;
+import controllers.TaskDialogFactory;
+import controllers.UserDialogFactory;
+import gui.components.TaskList;
+import gui.components.UserList;
 import dbcontext.DataHandler;
 import dto.*;
+import gui.components.Toast;
 import javafx.beans.binding.Bindings;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.input.MouseButton;
+
 import java.util.function.Function;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import jdk.jfr.Description;
 import utils.Logger;
 import utils.Message;
 import utils.MessageTypeEnum;
@@ -45,7 +45,7 @@ public class MainController {
   @FXML private TableColumn<TaskDTO, StatusDTO> statusColumn;
   @FXML private TableColumn<TaskDTO, PriorityDTO> priorityColumn;
   @FXML private TableColumn<TaskDTO, String> userColumn;
-  @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, nextTaskPage, previousTaskPage, logoutButton;
+  @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, viewAllTasks, logoutButton;
   @FXML private TextField searchField;
   @FXML private Label userCount;
   @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
@@ -69,8 +69,8 @@ public class MainController {
    */
   @FXML
   public void initialize() {
-    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/main.css")).toExternalForm());
-    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/global.css")).toExternalForm());
+    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/styles/main.css")).toExternalForm());
+    root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/styles/global.css")).toExternalForm());
     dataHandler = new DataHandler();
 
 
@@ -80,11 +80,11 @@ public class MainController {
 
     userTable.setFixedCellSize(60);
     taskTable.setCellFactory(param ->
-      new TaskListController(statusList, priorityList, userList, household, this::handleEditTask));
+      new TaskList(statusList, priorityList, userList, household, this::handleEditTask));
 
     userTable.setFixedCellSize(70);
     userTable.setCellFactory(param ->
-      new UserListCellController(this::handleUserClicked, this::handleUserEdit, this::handleUserDelete));
+      new UserList(this::handleUserClicked, this::handleUserEdit, this::handleUserDelete));
 
     Platform.runLater(() -> {
       statusList = FXCollections.observableArrayList(dataHandler.getAllStatus());
@@ -113,6 +113,8 @@ public class MainController {
     closeDoneBtn.setOnAction(e -> Logger.info("Close done tasks clicked!"));
     addUserBtn.setOnAction(this::handleAddUser);
     searchField.setOnAction(this::handleSearchDescription);
+    viewAllTasks.setOnAction(this::handleViewAllTask);
+
   }
 
   @FXML
@@ -241,15 +243,6 @@ public class MainController {
   }
 
   /**
-   * Retrieves all users for the current household.
-   *
-   * @return an ObservableList of UserDTO objects representing the users
-   */
-  public ObservableList<UserDTO> getAllUsers() {
-    return FXCollections.observableArrayList(dataHandler.getAllUsersByHousehold(household.getId()));
-  }
-
-  /**
    * Handles the addition of a new user by displaying a dialog.
    *
    * @param event the action event triggered by clicking the add user button
@@ -289,6 +282,16 @@ public class MainController {
     });
   }
 
+  private void handleViewAllTask(ActionEvent event) {
+    viewAllTasks.setVisible(false);
+    try {
+      taskList.setAll(getAllTasks());
+    }catch (Exception e){
+      Toast.showToast(root, new Message<>(MessageTypeEnum.ERROR, "An error occurred: "+e.getMessage()),-1);
+    }
+    Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Viewing all tasks"),3000);
+  }
+
   public void handleEditTask(TaskDTO task) {
     dataHandler.editTask(task); // TODO error handling
 
@@ -316,7 +319,7 @@ public class MainController {
    * @param event the action event triggered by the logout button
    */
   public void handleLogout(ActionEvent event) throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/login.fxml"));
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
     Parent loginRoot = loader.load();
 
     Scene loginScene = new Scene(loginRoot, 800, 500);
@@ -334,11 +337,14 @@ public class MainController {
 
   public void handleUserClicked(UserDTO user) {
     Message<List<TaskDTO>> queryResult = dataHandler.getUserTasks(user);
-
+    viewAllTasks.setVisible(true);
     if(queryResult.getType() == MessageTypeEnum.ERROR){
+      Toast.showToast(root, queryResult, 5000);
       Logger.error(queryResult.getMessage());
       return;
     }
+    queryResult.setType(MessageTypeEnum.INFO);
+    Toast.showToast(root, queryResult, 3000);
     taskList.setAll(queryResult.getResult());
     taskTable.refresh(); // Forces UI refresh
   }

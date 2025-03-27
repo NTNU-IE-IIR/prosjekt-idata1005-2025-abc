@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<BorderPane fx:id="root" stylesheets="@styles/main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainController">
 
     <!-- Top Bar -->
     <top>
@@ -100,6 +100,10 @@
                                 <Image url="@../icons/double-check-icon.png" />
                             </ImageView>
                         </graphic>
+                    </Button>
+
+                    <Button fx:id="viewAllTasks" visible="false" styleClass="user-link">
+                        ↩ View all tasks
                     </Button>
                 </HBox>
 

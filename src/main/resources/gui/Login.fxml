@@ -6,7 +6,7 @@
 <?import javafx.scene.text.*?>
 
 <VBox fx:id="root" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20" styleClass="login-container"
-      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.LoginController">
     <VBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="600.0">
         <Label alignment="CENTER" text="Welcome to HOME" styleClass="title-label">
             <font>

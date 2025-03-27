@@ -173,6 +173,7 @@
 .task-list{
     -fx-border-color: transparent;
     -fx-border-width: 0;
+    -fx-min-height: 600px;
 }
 
 .task-list:focused {
@@ -278,4 +279,11 @@
     -fx-border-color: transparent;
     -fx-effect: none;
     -fx-background-insets: 0;
+}
+
+.toast{
+    -fx-background-color: #D8FBD8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+    -fx-padding: 10;
 }

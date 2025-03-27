@@ -15,7 +15,7 @@ public class Main extends Application {
         System.setProperty("prism.text", "gray");
         System.setProperty("prism.lcdtext", "false");
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 800, 500);

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<HBox fx:id="toastRoot"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="gui.components.Toast"
+      spacing="8"
+      alignment="CENTER_LEFT"
+      styleClass="toast">
+
+    <!-- Icon -->
+    <ImageView fx:id="toastImage" fitHeight="26" preserveRatio="true">
+        <Image url="@../../icons/abc-logo.png" />
+    </ImageView>
+
+    <!-- Main toast message -->
+    <Label fx:id="messageLabel" text="Toast message"/>
+
+    <!-- Close 'X' -->
+    <Label fx:id="closeLabel" text="X"
+           style="-fx-cursor: hand;" />
+</HBox>

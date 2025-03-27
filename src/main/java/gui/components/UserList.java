@@ -1,18 +1,16 @@
-package controllers.helpers;
+package gui.components;
 
 import dto.UserDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.function.Consumer;
 
-public class UserListCellController extends ListCell<UserDTO> {
+public class UserList extends ListCell<UserDTO> {
   @FXML private HBox container;
   @FXML private Button nameButton;
   @FXML private Button editButton;
@@ -24,7 +22,7 @@ public class UserListCellController extends ListCell<UserDTO> {
   private final Consumer<UserDTO> editClickListener; // Name button callback
   private final Consumer<UserDTO> deleteClickListener; // Edit button callback
 
-  public UserListCellController(Consumer<UserDTO> clickListener, Consumer<UserDTO> editClickListener, Consumer<UserDTO> deleteClickListener) {
+  public UserList(Consumer<UserDTO> clickListener, Consumer<UserDTO> editClickListener, Consumer<UserDTO> deleteClickListener) {
     this.clickListener = clickListener;
     this.editClickListener = editClickListener;
     this.deleteClickListener = deleteClickListener;
@@ -33,7 +31,7 @@ public class UserListCellController extends ListCell<UserDTO> {
 
   private void loadFXML() {
     try {
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/UserListCell.fxml"));
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/components/UserList.fxml"));
       loader.setController(this);
       loader.load();
     } catch (IOException e) {
