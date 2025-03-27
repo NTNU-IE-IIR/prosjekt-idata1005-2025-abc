@@ -291,18 +291,23 @@ public class DataHandler {
         return message;
     }
 
-    public void deleteTask(TaskDTO task) {
+    public Message<Void> deleteTask(TaskDTO task) {
+        Message<Void> message;
         String query = "DELETE FROM tasks WHERE id = ?";
         try {
             int rowsAffected = dbHelper.executeUpdate(query, task.getId());
             if (rowsAffected > 0) {
+                message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully deleted task");
                 Logger.info("Task deleted successfully: " + task.getDescription());
             } else {
+                message = new Message<>("Failed to delete task");
                 Logger.error("Failed to delete task: " + task.getDescription());
             }
         } catch (SQLException e) {
+            message = new Message<>("Internal server error while deleting task");
             Logger.error("Error deleting task: " + e.getMessage());
         }
+        return message;
     }
 
     public Message<Void> editTask(TaskDTO editedTask) {

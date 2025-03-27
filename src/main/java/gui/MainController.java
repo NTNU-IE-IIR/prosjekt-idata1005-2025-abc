@@ -86,7 +86,7 @@ public class MainController {
     userTable.setCellFactory(param -> new UserList(this::handleUserClicked, this::handleUserEdit, this::handleUserDelete));
 
     taskTable.setFixedCellSize(60);
-    taskTable.setCellFactory(param -> new TaskList(statusList, priorityList, userList, household, isProgrammaticChange, this::handleEditTask));
+    taskTable.setCellFactory(param -> new TaskList(statusList, priorityList, userList, household, isProgrammaticChange, this::handleEditTask, this::handleDeleteTask));
 
     Platform.runLater(() -> {
       statusList = FXCollections.observableArrayList(dataHandler.getAllStatus());
@@ -311,6 +311,7 @@ public class MainController {
     if(message.getType() == MessageTypeEnum.ERROR){
       Toast.showToast(root, message, -1);
       Logger.error("(MainController.handleEditTask) An error occurred: " + message.getMessage());
+      return;
     }
     TaskDTO task = message.getResult();
     Message<Void> queryMessage = dataHandler.editTask(task);
@@ -318,12 +319,25 @@ public class MainController {
     if(queryMessage != null && queryMessage.getType() == MessageTypeEnum.ERROR){
       Toast.showToast(root, queryMessage, -1);
       Logger.error("(MainController.handleEditTask) An error occurred: " + message.getMessage());
+      return;
     }
 
     Toast.showToast(root, message, 5000);
     List<TaskDTO> updatedList = new ArrayList<>(taskList);
     updatedList.replaceAll(t -> t.getId() == task.getId() ? task : t);
     taskList.setAll(updatedList); // Triggers UI refresh
+  }
+
+  public void handleDeleteTask(TaskDTO task) {
+    Message<Void> queryResult = dataHandler.deleteTask(task);
+
+    if(queryResult.getType() == MessageTypeEnum.ERROR){
+      Logger.error("(MainController.handleDeleteTask) An error occurred: " + queryResult.getMessage());
+      Toast.showToast(root, queryResult, -1);
+      return;
+    }
+    Toast.showToast(root, queryResult, 3000);
+    taskList.remove(task);
   }
 
   /**

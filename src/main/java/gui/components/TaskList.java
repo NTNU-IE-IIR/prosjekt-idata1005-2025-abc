@@ -7,6 +7,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
@@ -30,11 +31,13 @@ public class TaskList extends ListCell<TaskDTO> {
   @FXML private ComboBox<StatusDTO> taskStatusDropdown;
   @FXML private ComboBox<PriorityDTO> taskPriorityDropdown;
   @FXML private ComboBox<UserDTO> taskOwnerDropdown;
+  @FXML private Button deleteTaskButton;
 
   private final HouseholdDTO household;
   private SimpleBooleanProperty isProgrammaticChange; // Guard flag
   private TaskDTO currentTask;  // Stores the current task being modified
   private final Consumer<Message<TaskDTO>> onChange;
+  private final Consumer<TaskDTO> onDelete;
   private final MyStatusListCell<StatusDTO> statusButtonCell;
   private final MyStatusListCell<PriorityDTO> priorityButtonCell;
   private final MyStatusListCell<UserDTO> ownerButtonCell;
@@ -129,10 +132,12 @@ public class TaskList extends ListCell<TaskDTO> {
                   ObservableList<PriorityDTO> priorityList,
                   ObservableList<UserDTO> userList, HouseholdDTO household,
                   SimpleBooleanProperty isProgrammaticChange,
-                  Consumer<Message<TaskDTO>> onChange) {
+                  Consumer<Message<TaskDTO>> onChange,
+                  Consumer<TaskDTO> onDelete) {
     loadFXML();
     this.household = household;
     this.onChange = onChange;
+    this.onDelete = onDelete;
     this.unassignedUser = new UserDTO(-1, "Unassigned", household);
     this.isProgrammaticChange = new SimpleBooleanProperty(false);
     this.isProgrammaticChange.bindBidirectional(isProgrammaticChange);
@@ -154,6 +159,8 @@ public class TaskList extends ListCell<TaskDTO> {
     taskStatusDropdown.valueProperty().addListener(this::taskUpdate);
     taskPriorityDropdown.valueProperty().addListener(this::taskUpdate);
     taskOwnerDropdown.valueProperty().addListener(this::taskUpdate);
+
+    deleteTaskButton.setOnAction(e -> onDelete.accept(currentTask));
   }
 
   private void loadFXML() {
