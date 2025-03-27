@@ -22,6 +22,11 @@
     <Label fx:id="messageLabel" text="Toast message"/>
 
     <!-- Close 'X' -->
-    <Label fx:id="closeLabel" text="X"
-           style="-fx-cursor: hand;" />
+    <Label fx:id="closeLabel">
+        <graphic>
+            <ImageView fitHeight="14" preserveRatio="true">
+                <Image url="@../../icons/cross-icon.png"/>
+            </ImageView>
+        </graphic>
+    </Label>
 </HBox>
