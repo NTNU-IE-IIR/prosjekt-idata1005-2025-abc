@@ -2,6 +2,7 @@ package gui.components;
 
 import dto.*;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -29,7 +30,7 @@ public class TaskList extends ListCell<TaskDTO> {
   @FXML private ComboBox<UserDTO> taskOwnerDropdown;
 
   private final HouseholdDTO household;
-  private boolean isProgrammaticChange = false;  // Guard flag
+  private SimpleBooleanProperty isProgrammaticChange; // Guard flag
   private TaskDTO currentTask;  // Stores the current task being modified
   private final Consumer<TaskDTO> onChange;
   private final MyStatusListCell<StatusDTO> statusButtonCell;
@@ -125,11 +126,14 @@ public class TaskList extends ListCell<TaskDTO> {
   public TaskList(ObservableList<StatusDTO> statusList,
                   ObservableList<PriorityDTO> priorityList,
                   ObservableList<UserDTO> userList, HouseholdDTO household,
+                  SimpleBooleanProperty isProgrammaticChange,
                   Consumer<TaskDTO> onChange) {
     loadFXML();
     this.household = household;
     this.onChange = onChange;
     this.unassignedUser = new UserDTO(-1, "Unassigned", household);
+    this.isProgrammaticChange = new SimpleBooleanProperty(false);
+    this.isProgrammaticChange.bindBidirectional(isProgrammaticChange);
 
     this.statusButtonCell = new MyStatusListCell<>();
     this.priorityButtonCell = new MyStatusListCell<>();
@@ -182,7 +186,7 @@ public class TaskList extends ListCell<TaskDTO> {
 
 
       // Temporarily ignore events before setValue
-      isProgrammaticChange = true;
+      isProgrammaticChange.setValue(true);
 
       // Set the current status, priority, owner or fallback to unassigned for user
       UserDTO defaultOwner = (task.getUser() != null)
@@ -201,7 +205,7 @@ public class TaskList extends ListCell<TaskDTO> {
       });
 
       // Re-allow the events
-      isProgrammaticChange = false;
+      isProgrammaticChange.setValue(false);
       setGraphic(container);
     }
   }
@@ -241,7 +245,7 @@ public class TaskList extends ListCell<TaskDTO> {
   }
 
   private void taskUpdate(ObservableValue<? extends SelectOption> observable, SelectOption  oldValue, SelectOption  newValue){
-    if (isProgrammaticChange) return;
+    if (isProgrammaticChange.getValue()) return;
     if(newValue == null) {
       Logger.error("No newValue in update Task");
       return;

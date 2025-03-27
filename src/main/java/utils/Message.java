@@ -5,9 +5,9 @@ public class Message<T> {
   private String message;
   private T result;
 
-  public Message() {
+  public Message(String message) {
     this.type = MessageTypeEnum.ERROR;
-    this.message = "";
+    this.message = message;
     this.result = null;
   }
 

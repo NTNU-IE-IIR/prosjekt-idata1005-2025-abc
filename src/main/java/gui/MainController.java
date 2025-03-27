@@ -10,6 +10,8 @@ import dto.*;
 import gui.components.Toast;
 import javafx.beans.binding.Bindings;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -61,7 +63,7 @@ public class MainController {
   private ObservableList<PriorityDTO> priorityList;
   private ObservableList<UserDTO> userList;
   private Label lastClickedTaskOrder = null;
-
+  private SimpleBooleanProperty isProgrammaticChange;
 
   /**
    * Initializes the MainController by setting up UI elements, registering event handlers,
@@ -72,7 +74,7 @@ public class MainController {
     root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/styles/main.css")).toExternalForm());
     root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/styles/global.css")).toExternalForm());
     dataHandler = new DataHandler();
-
+    isProgrammaticChange = new SimpleBooleanProperty(false);
 
     // Ensure both spacers expand to push elements apart
     HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -80,7 +82,7 @@ public class MainController {
 
     userTable.setFixedCellSize(60);
     taskTable.setCellFactory(param ->
-      new TaskList(statusList, priorityList, userList, household, this::handleEditTask));
+      new TaskList(statusList, priorityList, userList, household, isProgrammaticChange, this::handleEditTask));
 
     userTable.setFixedCellSize(70);
     userTable.setCellFactory(param ->
@@ -352,14 +354,35 @@ public class MainController {
   public void handleUserEdit(UserDTO user) {
     Optional<UserDTO> result = UserDialogFactory.createEditUserDialog(user, household).showAndWait();
     result.ifPresent(editedUser -> {
-      dataHandler.editUser(editedUser); // TODO error handling
+      isProgrammaticChange.setValue(true);
+      Message<Void> queryResult = dataHandler.editUser(editedUser);
+
+      if(queryResult.getType() == MessageTypeEnum.ERROR){
+        Toast.showToast(root, queryResult, -1);
+        return;
+      }
+      Toast.showToast(root, queryResult, 3000);
 
       List<UserDTO> updatedList = new ArrayList<>(userList);
       updatedList.replaceAll(u -> u.getId() == editedUser.getId() ? editedUser : u);
+
+
+      List<TaskDTO> updatedTaskList = new ArrayList<>(taskList);
+      updatedTaskList.replaceAll(u -> {
+        if(u.getUser() != null){
+          if(u.getUser().getId() == editedUser.getId()) {
+            u.setUser(editedUser);
+          }
+        }
+        return u;
+      });
       userList.setAll(updatedList);
+      taskList.setAll(updatedTaskList);
+      isProgrammaticChange.setValue(false);
     });
   }
   public void handleUserDelete(UserDTO user) {
+    isProgrammaticChange.setValue(true);
     // Create Confirmation Alert
     Logger.info(String.valueOf(user.getId()));
     Logger.info(user.getName());
@@ -376,9 +399,18 @@ public class MainController {
     if (result.isPresent() && result.get() == ButtonType.OK) {
       dataHandler.deleteUser(user);   // Delete from database
       userList.remove(user);          // Remove from UI list
-      taskList.setAll(getAllTasks()); // Pull the changes to the tasks
-      taskTable.setItems(taskList);
-    }
 
+      List<TaskDTO> updatedTaskList = new ArrayList<>(taskList);
+      updatedTaskList.replaceAll(u -> {
+        if(u.getUser() != null){
+          if(u.getUser().getId() == user.getId()) {
+            u.setUser(null);
+          }
+        }
+        return u;
+      });
+      taskList.setAll(updatedTaskList);
+    }
+    isProgrammaticChange.setValue(false);
   }
 }

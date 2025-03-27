@@ -249,6 +249,7 @@ public class DataHandler {
     }
 
     public Message<List<TaskDTO>> getUserTasks(UserDTO user) {
+        Message<List<TaskDTO>> message;
         String query ="SELECT " +
           "t.id, t.description, " +
           "h.id AS household_id, h.name AS household_name, " +
@@ -262,8 +263,6 @@ public class DataHandler {
           "LEFT JOIN users u ON t.ownerId = u.id " +
           "WHERE t.householdId = ? AND u.id = ? " +
           "ORDER BY t.id DESC";
-
-        Message<List<TaskDTO>> message;
         try {
             List<TaskDTO> result = dbHelper.executeSelect(query, TaskDTO.class,user.getHousehold().getId(), user.getId());
             message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully viewing tasks for "+user.getName(), result);
@@ -274,21 +273,22 @@ public class DataHandler {
         return message;
     }
 
-    public void editUser(UserDTO selectedUser) {
+    public Message<Void> editUser(UserDTO selectedUser) {
+        Message<Void> message;
         String query = "UPDATE users SET name = ? WHERE id = ?";
         try {
             int rowsAffected = dbHelper.executeUpdate(query, selectedUser.getName(), selectedUser.getId());
             if (rowsAffected > 0) {
-                Logger.info("User updated successfully: " + selectedUser.getName());
-                System.out.println(query);
-                System.out.println(selectedUser.getName() + " " + selectedUser.getId());
+                message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully updated user: "+ selectedUser.getName());
+                Logger.info("Successfully updated user: "+ selectedUser.getName());
             } else {
+                message = new Message<>("Failed to update user: "+ selectedUser.getName());
                 Logger.error("Failed to update user: " + selectedUser.getId() + " to " + selectedUser.getName());
-                System.out.println(query);
             }
         } catch (SQLException e) {
-            System.out.println(query);
+            message = new Message<>("Internal server error while updating user");
         }
+        return message;
     }
 
     public void deleteTask(TaskDTO task) {
