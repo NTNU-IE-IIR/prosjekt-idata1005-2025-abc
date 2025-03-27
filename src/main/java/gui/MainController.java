@@ -114,11 +114,6 @@ public class MainController {
     searchField.setOnAction(this::handleSearchDescription);
     viewAllTasks.setOnAction(this::handleViewAllTask);
 
-    // Register sort labels mouse click handler.
-    sortTaskDescription.setOnMouseClicked(this::handleSortClick);
-    sortTaskStatus.setOnMouseClicked(this::handleSortClick);
-    sortTaskPriority.setOnMouseClicked(this::handleSortClick);
-    sortTaskOwner.setOnMouseClicked(this::handleSortClick);
   }
 
   /**
@@ -305,15 +300,27 @@ public class MainController {
     viewAllTasks.setVisible(false);
     try {
       taskList.setAll(getAllTasks());
+      originalTaskList = new ArrayList<>(taskList);
     } catch (Exception e) {
       Toast.showToast(root, new Message<>(MessageTypeEnum.ERROR, "An error occurred: " + e.getMessage()), -1);
     }
     Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Viewing all tasks"), 3000);
   }
 
-  public void handleEditTask(TaskDTO task) {
-    dataHandler.editTask(task); // TODO error handling
+  public void handleEditTask(Message<TaskDTO> message) {
+    if(message.getType() == MessageTypeEnum.ERROR){
+      Toast.showToast(root, message, -1);
+      Logger.error("(MainController.handleEditTask) An error occurred: " + message.getMessage());
+    }
+    TaskDTO task = message.getResult();
+    Message<Void> queryMessage = dataHandler.editTask(task);
 
+    if(queryMessage != null && queryMessage.getType() == MessageTypeEnum.ERROR){
+      Toast.showToast(root, queryMessage, -1);
+      Logger.error("(MainController.handleEditTask) An error occurred: " + message.getMessage());
+    }
+
+    Toast.showToast(root, message, 5000);
     List<TaskDTO> updatedList = new ArrayList<>(taskList);
     updatedList.replaceAll(t -> t.getId() == task.getId() ? task : t);
     taskList.setAll(updatedList); // Triggers UI refresh
@@ -328,7 +335,8 @@ public class MainController {
     List<TaskDTO> query = dataHandler.getAllTasksByHouseHold(household.getId(), userQuery);
     ObservableList<TaskDTO> result = FXCollections.observableArrayList(query);
     Logger.info("Search tasks for: " + userQuery);
-    taskTable.setItems(result);
+    taskList.setAll(result);
+    originalTaskList = new ArrayList<>(taskList);
   }
 
   /**
@@ -363,6 +371,7 @@ public class MainController {
     queryResult.setType(MessageTypeEnum.INFO);
     Toast.showToast(root, queryResult, 3000);
     taskList.setAll(queryResult.getResult());
+    originalTaskList = new ArrayList<>(taskList);
     taskTable.refresh(); // Forces UI refresh
   }
 

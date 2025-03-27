@@ -305,7 +305,8 @@ public class DataHandler {
         }
     }
 
-    public void editTask(TaskDTO editedTask) {
+    public Message<Void> editTask(TaskDTO editedTask) {
+        Message<Void> message = null;
         String query = "UPDATE tasks SET description = ?, statusId = ?, priorityId = ?, ownerId = ? WHERE id = ?";
         try {
             int rowsAffected = dbHelper.executeUpdate(
@@ -321,7 +322,9 @@ public class DataHandler {
                 Logger.error("Failed to update task: " + editedTask.getDescription());
             }
         } catch (SQLException e) {
+            message = new Message<>("Internal server error while updating task");
             Logger.error("Error updating task: " + e.getMessage());
         }
+        return message;
     }
 }

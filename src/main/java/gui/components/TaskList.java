@@ -14,6 +14,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.ComboBox;
 import utils.Logger;
+import utils.Message;
+import utils.MessageTypeEnum;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,7 +34,7 @@ public class TaskList extends ListCell<TaskDTO> {
   private final HouseholdDTO household;
   private SimpleBooleanProperty isProgrammaticChange; // Guard flag
   private TaskDTO currentTask;  // Stores the current task being modified
-  private final Consumer<TaskDTO> onChange;
+  private final Consumer<Message<TaskDTO>> onChange;
   private final MyStatusListCell<StatusDTO> statusButtonCell;
   private final MyStatusListCell<PriorityDTO> priorityButtonCell;
   private final MyStatusListCell<UserDTO> ownerButtonCell;
@@ -127,7 +129,7 @@ public class TaskList extends ListCell<TaskDTO> {
                   ObservableList<PriorityDTO> priorityList,
                   ObservableList<UserDTO> userList, HouseholdDTO household,
                   SimpleBooleanProperty isProgrammaticChange,
-                  Consumer<TaskDTO> onChange) {
+                  Consumer<Message<TaskDTO>> onChange) {
     loadFXML();
     this.household = household;
     this.onChange = onChange;
@@ -250,13 +252,29 @@ public class TaskList extends ListCell<TaskDTO> {
       Logger.error("No newValue in update Task");
       return;
     }
-    if(newValue instanceof StatusDTO)
-      currentTask.setStatus((StatusDTO) newValue);
-    if(newValue instanceof PriorityDTO)
-      currentTask.setPriority((PriorityDTO) newValue);
-    if(newValue instanceof UserDTO)
-      currentTask.setUser((UserDTO) newValue);
-    onChange.accept(currentTask);
-    System.out.println("taskPriorityUpdate triggered: " + newValue.getName());
+    Message<TaskDTO> message;
+
+    switch (newValue) {
+      case StatusDTO statusDTO -> {
+        currentTask.setStatus(statusDTO);
+        String stringMessage = "Status updated: " + oldValue.getName() + " → " + newValue.getName();
+        message = new Message<>(MessageTypeEnum.SUCCESS, stringMessage, currentTask);
+      }
+      case PriorityDTO priorityDTO -> {
+        currentTask.setPriority(priorityDTO);
+        String stringMessage = "Priority updated: " + oldValue.getName() + " → " + newValue.getName();
+        message = new Message<>(MessageTypeEnum.SUCCESS, stringMessage, currentTask);
+      }
+      case UserDTO userDTO -> {
+        currentTask.setUser(userDTO);
+        String stringMessage = "Owner updated: " + oldValue.getName() + " → " + newValue.getName();
+        message = new Message<>(MessageTypeEnum.SUCCESS, stringMessage, currentTask);
+      }
+      default -> {
+        message = new Message<>("Unsupported action");
+      }
+    }
+    onChange.accept(message);
+    Logger.info("Task updated triggered: " + newValue.getName());
   }
 }
