@@ -38,13 +38,21 @@ public class Toast {
   @FXML
   private ImageView toastImage;
 
+  // Static reference to hold the current toast
+  private static Popup currentToast;
+
   /**
    * Static method to show a toast anchored to the bottom-left corner
-   * of the given root node, displaying the given message for the
+   * of the given anchor node, displaying the given message for the
    * specified duration in milliseconds. If {@code durationMs} is less than 0 the toast won't disappear.
    */
   public static<T> void showToast(Node anchorNode, Message<T> message, int durationMs) {
     try {
+      // Hide previous toast if it exists
+      if (currentToast != null) {
+        currentToast.hide();
+      }
+
       // 1) Load the FXML / CSS, which uses Toast as its controller
       FXMLLoader loader = new FXMLLoader(Toast.class.getResource("/gui/components/Toast.fxml"));
       Parent toastContent = loader.load();
@@ -57,14 +65,12 @@ public class Toast {
       controller.messageLabel.setText(message.getMessage());
 
       switch (message.getType()) {
-
         case SUCCESS:
           controller.toastRoot.setStyle("-fx-background-color: #C6EECD");
           controller.toastImage.setImage(
             new Image(Objects.requireNonNull(Toast.class.getResource("/icons/done-icon.png"))
               .toExternalForm()));
           break;
-
         case ERROR:
           controller.toastRoot.setStyle("-fx-background-color: #F68C8C");
           controller.toastImage.setImage(
@@ -90,6 +96,9 @@ public class Toast {
       popup.setAutoHide(true); // closes if user clicks outside
       popup.getContent().add(toastContent);
 
+      // Save the current popup reference
+      currentToast = popup;
+
       // 5) Position the toast at the bottom-left of anchorNode
       Bounds nodeBounds = anchorNode.getBoundsInLocal();
       Point2D screenCoords = anchorNode.localToScreen(
@@ -105,7 +114,12 @@ public class Toast {
       }
 
       // 6) Close button handler
-      controller.closeLabel.setOnMouseClicked(e -> popup.hide());
+      controller.closeLabel.setOnMouseClicked(e -> {
+        popup.hide();
+        if (currentToast == popup) {
+          currentToast = null;
+        }
+      });
 
       // 7) Fade in
       FadeTransition fadeIn = new FadeTransition(Duration.millis(200), toastContent);
@@ -120,13 +134,18 @@ public class Toast {
           FadeTransition fadeOut = new FadeTransition(Duration.millis(200), toastContent);
           fadeOut.setFromValue(1.0);
           fadeOut.setToValue(0.0);
-          fadeOut.setOnFinished(evt -> popup.hide());
+          fadeOut.setOnFinished(evt -> {
+            popup.hide();
+            if (currentToast == popup) {
+              currentToast = null;
+            }
+          });
           fadeOut.play();
         });
         wait.play();
       }
     } catch (IOException e) {
-      Logger.error("The toast has failed: "+e.getMessage());
+      Logger.error("The toast has failed: " + e.getMessage());
     }
   }
 }
