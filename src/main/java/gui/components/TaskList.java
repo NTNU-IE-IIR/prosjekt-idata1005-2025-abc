@@ -188,7 +188,7 @@ public class TaskList extends ListCell<TaskDTO> {
       // Temporarily ignore events before setValue
       isProgrammaticChange.setValue(true);
 
-      // Set the current status, priority, owner or fallback to unassigned for user
+      // Set the current status, priority, owner or fallback to unassigned user
       UserDTO defaultOwner = (task.getUser() != null)
         ? task.getUser()
         : unassignedUser;

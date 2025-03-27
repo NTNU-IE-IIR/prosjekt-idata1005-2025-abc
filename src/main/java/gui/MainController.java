@@ -187,20 +187,24 @@ public class MainController {
   }
 
   private void sortTaskOwner(boolean reverse) {
-    sortTaskList(
-      TaskDTO::getUser,
-      Comparator.nullsLast(
-        Comparator.comparing(UserDTO::getName, String.CASE_INSENSITIVE_ORDER)
-      ),
-      reverse
-    );
-  }
+    Comparator<UserDTO> userComparator = Comparator.nullsLast((u1, u2) -> {
+      // If one user has id -1 and the other doesn't, that user goes last.
+      if (u1.getId() == -1 && u2.getId() != -1) {
+        return 1;
+      } else if (u1.getId() != -1 && u2.getId() == -1) {
+        return -1;
+      }
+      // Both are either -1 or both are non -1, so compare names case-insensitively.
+      return String.CASE_INSENSITIVE_ORDER.compare(u1.getName(), u2.getName());
+    });
 
+    sortTaskList(TaskDTO::getUser, userComparator, reverse);
+  }
   private void sortTaskStatus(boolean reverse) {
     sortTaskList(
       TaskDTO::getStatus,
       Comparator.nullsLast(
-        Comparator.comparing(StatusDTO::getName, String.CASE_INSENSITIVE_ORDER)
+        Comparator.comparing(StatusDTO::getId)
       ),
       reverse
     );
@@ -210,9 +214,9 @@ public class MainController {
     sortTaskList(
       TaskDTO::getPriority,
       Comparator.nullsLast(
-        Comparator.comparing(PriorityDTO::getName, String.CASE_INSENSITIVE_ORDER)
+        Comparator.comparing(PriorityDTO::getId)
       ),
-      reverse
+      !reverse
     );
   }
 
