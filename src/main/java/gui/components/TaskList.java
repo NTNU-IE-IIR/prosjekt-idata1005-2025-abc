@@ -221,7 +221,7 @@ public class TaskList extends ListCell<TaskDTO> {
     }
     switch (task.getPriority().getId()){
       case 1:
-        styles[1] = "#7AF6B8";
+        styles[1] = "#98F5F9";
         break;
       case 2:
         styles[1] = "#B5BAF5";

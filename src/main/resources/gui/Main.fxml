@@ -115,7 +115,7 @@
                         <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick" prefWidth="140">Priority</Label>
                         <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick" prefWidth="240">Owner</Label>
                     </HBox>
-                    <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" prefWidth="1230"   />
+                    <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" prefWidth="1230"/>
                 </VBox>
 
                 <!-- Footer -->
