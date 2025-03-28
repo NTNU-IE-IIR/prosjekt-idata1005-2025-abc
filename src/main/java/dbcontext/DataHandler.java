@@ -8,6 +8,7 @@ import utils.MessageTypeEnum;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
 
 public class DataHandler {
     private static final DatabaseHelper dbHelper;
@@ -135,28 +136,7 @@ public class DataHandler {
         }
         return tasks;
     }
-    public List<TaskDTO> getAllClosedTasks(int householdId) {
-        List<TaskDTO> tasks = new ArrayList<>();
-        String query = "SELECT " +
-                "t.id, t.description, " +
-                "h.id AS household_id, h.name AS household_name, " +
-                "s.id AS status_id, s.name AS status_name, " +
-                "p.id AS priority_id, p.name AS priority_name, " +
-                "u.id AS user_id, u.name AS user_name " +
-                "FROM tasks t " +
-                "LEFT JOIN households h ON t.householdId = h.id " +
-                "LEFT JOIN status s ON t.statusId = s.id " +
-                "LEFT JOIN priorities p ON t.priorityId = p.id " +
-                "LEFT JOIN users u ON t.ownerId = u.id " +
-                "WHERE t.householdId = ? AND t.statusId = 1 " +
-                "ORDER BY t.id DESC";
-        try {
-            tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId);
-        } catch (SQLException e) {
-            Logger.error("Error fetching tasks: " + e.getMessage());
-        }
-        return tasks;
-    }
+
 
 
     public List<TaskDTO> getAllTasksByHouseHold(int householdId, String userQuery) {
@@ -376,4 +356,51 @@ public class DataHandler {
         }
         return message;
     }
+    public List<TaskDTO> getClosedTasks(int householdId) {
+        List<TaskDTO> tasks = new ArrayList<>();
+        Message<Void> message = null;
+        String query = "SELECT " +
+                "t.id, t.description, " +
+                "h.id AS household_id, h.name AS household_name, " +
+                "s.id AS status_id, s.name AS status_name, " +
+                "p.id AS priority_id, p.name AS priority_name, " +
+                "u.id AS user_id, u.name AS user_name " +
+                "FROM tasks t " +
+                "LEFT JOIN households h ON t.householdId = h.id " +
+                "LEFT JOIN status s ON t.statusId = s.id " +
+                "LEFT JOIN priorities p ON t.priorityId = p.id " +
+                "LEFT JOIN users u ON t.ownerId = u.id " +
+                "WHERE t.householdId = ? AND t.statusId = 4 " +
+                "ORDER BY t.id DESC";
+        try {
+            tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId);
+            message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully fetched closed tasks");
+        } catch (SQLException e) {
+            Logger.error("Error fetching tasks: " + e.getMessage());
+            message  = new Message<>(MessageTypeEnum.ERROR, "Error fetching closed tasks: "+ e.getMessage());
+        }
+        return tasks;
+    }
+//    public List<TaskDTO> getAllTasksByHouseHold(int householdId) {
+//        List<TaskDTO> tasks = new ArrayList<>();
+//        String query = "SELECT " +
+//                "t.id, t.description, " +
+//                "h.id AS household_id, h.name AS household_name, " +
+//                "s.id AS status_id, s.name AS status_name, " +
+//                "p.id AS priority_id, p.name AS priority_name, " +
+//                "u.id AS user_id, u.name AS user_name " +
+//                "FROM tasks t " +
+//                "LEFT JOIN households h ON t.householdId = h.id " +
+//                "LEFT JOIN status s ON t.statusId = s.id " +
+//                "LEFT JOIN priorities p ON t.priorityId = p.id " +
+//                "LEFT JOIN users u ON t.ownerId = u.id " +
+//                "WHERE t.householdId = ? AND t.statusId BETWEEN 1 AND 3 " +
+//                "ORDER BY t.id DESC";
+//        try {
+//            tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId);
+//        } catch (SQLException e) {
+//            Logger.error("Error fetching tasks: " + e.getMessage());
+//        }
+//        return tasks;
+//    }
 }
