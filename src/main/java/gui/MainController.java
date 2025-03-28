@@ -131,8 +131,7 @@ public class MainController {
         Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Tasks closed successfully"),3000);
       }
     }
-
-
+    taskTable.refresh();
   }
 
   /**
