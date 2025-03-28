@@ -118,24 +118,16 @@ public class MainController {
   }
 
   private void showClosedTasks(ActionEvent actionEvent) {
-    List<TaskDTO> doneTasks = new ArrayList<>();
-    taskList.forEach(task -> {
-      if(task.getStatus().getId() == 4){
-        doneTasks.add(task);
-      }
-    });
     List<TaskDTO> query = dataHandler.getClosedTasks(household.getId());
-    if(!doneTasks.isEmpty()){
+    if(query.isEmpty()){
       Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "No closed tasks"), 3000);
     }else{
-      taskList.setAll(doneTasks);
-      originalTaskList = new ArrayList<>(taskList);
       Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Viewing closed tasks"), 3000);
       viewAllTasks.setVisible(true);
+      taskList.setAll(dataHandler.getClosedTasks(household.getId()));
+      originalTaskList = new ArrayList<>(taskList);
+      taskTable.refresh();
     }
-    taskList.setAll(dataHandler.getClosedTasks(household.getId()));
-    originalTaskList = new ArrayList<>(taskList);
-    taskTable.refresh();
   }
 
   private void closeDoneTasks(ActionEvent actionEvent) {
