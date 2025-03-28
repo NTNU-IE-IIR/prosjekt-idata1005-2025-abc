@@ -85,7 +85,7 @@ public class DataHandler {
                 "VALUES (?, ?, ?, ?, ?)";
         try {
             int rowsAffected = dbHelper.executeUpdate(query, task.getHouseholdId(),
-                    task.getDescription(), 3, task.getPriorityId(), task.getUserId());
+                    task.getDescription(), 4, task.getPriorityId(), task.getUserId());
 
             if (rowsAffected == 0) {
                 message = new Message<>(MessageTypeEnum.ERROR, "Could not add the task.");
@@ -329,6 +329,27 @@ public class DataHandler {
         } catch (SQLException e) {
             message = new Message<>("Internal server error while updating task");
             Logger.error("Error updating task: " + e.getMessage());
+        }
+        return message;
+    }
+
+    public Message<Void> closeDoneTasks(TaskDTO doneTasks) {
+        Message<Void> message = null;
+        String query = "UPDATE tasks SET statusId = 4 WHERE id = ?";
+        try{
+            int rowsAffected = dbHelper.executeUpdate(
+                    query,
+                    doneTasks.getId());
+            if (rowsAffected > 0) {
+                Logger.info("Task closed successfully: " + doneTasks.getDescription());
+            } else {
+                System.out.println(query);
+                Logger.error("Failed to close task: " + doneTasks.getDescription());
+            }
+        } catch (SQLException e) {
+            System.out.println(query);
+            message = new Message<>("Internal server error while closing tasks");
+            Logger.error("Error closing tasks: " + e.getMessage());
         }
         return message;
     }

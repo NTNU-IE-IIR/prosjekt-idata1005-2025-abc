@@ -45,7 +45,7 @@ public class MainController {
   @FXML private TableColumn<TaskDTO, StatusDTO> statusColumn;
   @FXML private TableColumn<TaskDTO, PriorityDTO> priorityColumn;
   @FXML private TableColumn<TaskDTO, String> userColumn;
-  @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, viewAllTasks, logoutButton;
+  @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, viewAllTasks, logoutButton, doneTasksBtn;
   @FXML private TextField searchField;
   @FXML private Label userCount;
   @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
@@ -109,10 +109,29 @@ public class MainController {
     // Register button event handlers.
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
-    closeDoneBtn.setOnAction(e -> Logger.info("Close done tasks clicked!"));
+    closeDoneBtn.setOnAction(this::closeDoneTasks);
     addUserBtn.setOnAction(this::handleAddUser);
     searchField.setOnAction(this::handleSearchDescription);
     viewAllTasks.setOnAction(this::handleViewAllTask);
+
+  }
+
+  private void closeDoneTasks(ActionEvent actionEvent) {
+    List<TaskDTO> doneTasks = new ArrayList<>();
+    taskList.forEach(task -> {
+      if(task.getStatus().getId() == 1){
+        doneTasks.add(task);
+      }
+    });
+    for(TaskDTO task : doneTasks){
+      Message<Void> queryResult = dataHandler.closeDoneTasks(task);
+      if(doneTasks.isEmpty()){
+        Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "No tasks to close"), 3000);
+      }else{
+        Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Tasks closed successfully"),3000);
+      }
+    }
+
 
   }
 

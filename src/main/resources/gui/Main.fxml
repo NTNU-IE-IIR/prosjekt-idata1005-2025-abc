@@ -101,6 +101,13 @@
                             </ImageView>
                         </graphic>
                     </Button>
+                    <Button fx:id ="doneTasksBtn" text="Show closed done tasks">
+                        <graphic>
+                            <ImageView fitHeight="14" preserveRatio="true">
+                                <Image url="@../icons/double-check-icon.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
                     <Button fx:id="viewAllTasks" visible="false" styleClass="user-link">
                         ↩ View all tasks
