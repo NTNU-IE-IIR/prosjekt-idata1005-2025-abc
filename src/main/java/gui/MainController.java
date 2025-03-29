@@ -31,6 +31,8 @@ import utils.MessageTypeEnum;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The MainController class manages the primary UI interactions including handling tasks,
@@ -128,6 +130,7 @@ public class MainController {
       originalTaskList = new ArrayList<>(taskList);
       taskTable.refresh();
       sortTaskStatus.setText("Date");
+      resetSortActions();
     }
   }
 
@@ -206,6 +209,11 @@ public class MainController {
   private void resetSortLabels() {
     List<Label> sortLabels = List.of(sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner);
     sortLabels.forEach(label -> label.setText(stripArrows(label.getText())));
+  }
+
+  private void resetSortActions() {
+    resetSortLabels();
+    sortClickCounts.clear();
   }
 
   /**
@@ -341,6 +349,7 @@ public class MainController {
     }
     Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Viewing all tasks"), 3000);
     sortTaskStatus.setText("Status");
+    resetSortActions();
   }
 
   public void handleEditTask(Message<TaskDTO> message) {
@@ -382,11 +391,24 @@ public class MainController {
    */
   private void handleSearchDescription(ActionEvent event) {
     String userQuery = searchField.getText();
-    List<TaskDTO> query = dataHandler.getAllTasksByHouseHold(household.getId(), userQuery);
-    ObservableList<TaskDTO> result = FXCollections.observableArrayList(query);
-    Logger.info("Search tasks for: " + userQuery);
-    taskList.setAll(result);
-    originalTaskList = new ArrayList<>(taskList);
+    resetSortActions();
+    // Create a regex to simulate SQL LIKE '%abc%'
+    String regex = ".*" + Pattern.quote(userQuery) + ".*";
+    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    ObservableList<TaskDTO> filteredList;
+    if (userQuery.trim().isEmpty()) {
+      // If the search query is empty, return the full list
+      filteredList = FXCollections.observableArrayList(originalTaskList);
+    }else {
+      // Filter the list using the pattern.
+      filteredList = originalTaskList.stream()
+        .filter(task -> {
+          String description = task.getDescription();
+          return description != null && pattern.matcher(description).matches();
+        })
+        .collect(Collectors.toCollection(FXCollections::observableArrayList));
+    }
+    taskList.setAll(filteredList);
   }
 
   /**
@@ -423,6 +445,7 @@ public class MainController {
     taskList.setAll(queryResult.getResult());
     originalTaskList = new ArrayList<>(taskList);
     taskTable.refresh(); // Forces UI refresh
+    resetSortActions();
   }
 
   public void handleUserEdit(UserDTO user) {

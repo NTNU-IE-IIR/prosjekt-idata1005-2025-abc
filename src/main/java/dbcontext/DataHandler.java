@@ -86,7 +86,7 @@ public class DataHandler {
                 "VALUES (?, ?, ?, ?, ?)";
         try {
             int rowsAffected = dbHelper.executeUpdate(query, task.getHouseholdId(),
-                    task.getDescription(), 4, task.getPriorityId(), task.getUserId());
+                    task.getDescription(), task.getStatus().getId(), task.getPriorityId(), task.getUserId());
 
             if (rowsAffected == 0) {
                 message = new Message<>(MessageTypeEnum.ERROR, "Could not add the task.");
