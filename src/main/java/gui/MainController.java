@@ -61,6 +61,7 @@ public class MainController {
   private ObservableList<StatusDTO> statusList;
   private ObservableList<PriorityDTO> priorityList;
   private ObservableList<UserDTO> userList;
+  private String userQuery="";
 
   // For storing the original unsorted order of tasks.
   private List<TaskDTO> originalTaskList;
@@ -172,9 +173,23 @@ public class MainController {
     // Reset arrows on all labels.
     resetSortLabels();
 
+    // Third press: revert to default (unsorted) order.
     if (clickCount == 0) {
-      // Third press: revert to default (unsorted) order.
-      taskList.setAll(originalTaskList);
+      // Local sort within search parameters
+      if (!userQuery.isEmpty()) {
+        String regex = ".*" + Pattern.quote(userQuery) + ".*";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+        taskList.setAll(originalTaskList.stream()
+          .filter(task -> {
+            String description = task.getDescription();
+            return description != null && pattern.matcher(description).find();
+          })
+          .collect(Collectors.toCollection(ArrayList::new))
+        );
+      }else{
+        taskList.setAll(originalTaskList);
+      }
       clickedLabel.setText(stripArrows(clickedLabel.getText()));
       return;
     }
@@ -391,8 +406,7 @@ public class MainController {
    */
   private void handleSearchDescription(ActionEvent event) {
     String userQuery = searchField.getText();
-    resetSortActions();
-    // Create a regex to simulate SQL LIKE '%abc%'
+    // Create a regex to simulate SQL LIKE '%query%'
     String regex = ".*" + Pattern.quote(userQuery) + ".*";
     Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
     ObservableList<TaskDTO> filteredList;
@@ -409,6 +423,8 @@ public class MainController {
         .collect(Collectors.toCollection(FXCollections::observableArrayList));
     }
     taskList.setAll(filteredList);
+    this.userQuery = userQuery;
+    resetSortActions();
   }
 
   /**
