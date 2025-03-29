@@ -178,6 +178,10 @@ public class TaskDTO {
     return null;
   }
 
+  public void setId(int id) {
+    this.id = id;
+  }
+
   /**
    * Updates the task status.
    *

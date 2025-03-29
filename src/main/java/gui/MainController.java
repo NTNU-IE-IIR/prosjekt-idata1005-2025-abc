@@ -112,7 +112,7 @@ public class MainController {
     // Register button event handlers.
     addTaskBtn.setOnAction(this::handleAddTask);
     distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
-    closeDoneBtn.setOnAction(this::closeDoneTasks);
+    closeDoneBtn.setOnAction(this::handleCloseTasks);
     addUserBtn.setOnAction(this::handleAddUser);
     searchField.setOnAction(this::handleSearchDescription);
     viewAllTasks.setOnAction(this::handleViewAllTask);
@@ -135,7 +135,7 @@ public class MainController {
     }
   }
 
-  private void closeDoneTasks(ActionEvent actionEvent) {
+  private void handleCloseTasks(ActionEvent actionEvent) {
     List<TaskDTO> doneTasks = new ArrayList<>();
     taskList.forEach(task -> {
       if(task.getStatus().getId() == 1){
@@ -344,12 +344,17 @@ public class MainController {
     Optional<TaskDTO> result = TaskDialogFactory.createAddTaskDialog(household, priorityList, userList).showAndWait();
     result.ifPresent(task -> {
       task.setStatus(new StatusDTO(3, "Not started"));
-      Message<Void> resultMsg = dataHandler.addTask(task);
+      Message<Integer> resultMsg = dataHandler.addTask(task);
+
       if(resultMsg.getType() == MessageTypeEnum.ERROR){
         Logger.error(resultMsg.getMessage());
+        Toast.showToast(root, resultMsg,-1);
       } else if(resultMsg.getType() == MessageTypeEnum.SUCCESS){
         Logger.info("Task added successfully");
-        taskList.add(task);
+        Toast.showToast(root, resultMsg,3000);
+        // Set task generated id
+        task.setId(resultMsg.getResult());
+        taskList.addFirst(task);
       }
     });
   }
