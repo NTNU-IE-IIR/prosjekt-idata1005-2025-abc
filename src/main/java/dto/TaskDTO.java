@@ -1,5 +1,8 @@
 package dto;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 /**
  * Represents a task with associated details such as description, status, priority, and assigned user.
  */
@@ -10,6 +13,7 @@ public class TaskDTO {
   private StatusDTO status;
   private PriorityDTO priority;
   private UserDTO user;
+  private LocalDate doneDate;
 
   /**
    * Default constructor.
@@ -49,6 +53,27 @@ public class TaskDTO {
     this.priority = priority;
     this.user = user;
   }
+
+  /**
+   * Constructs a TaskDTO with all properties for an existing task.
+   *
+   * @param id          the task id
+   * @param description the task description
+   * @param household   the associated household
+   * @param status      the task status
+   * @param priority    the task priority
+   * @param user        the assigned user
+   */
+  public TaskDTO(int id, String description, HouseholdDTO household, StatusDTO status, PriorityDTO priority, UserDTO user, LocalDate doneDate) {
+    this.id = id;
+    this.description = description;
+    this.household = household;
+    this.status = status;
+    this.priority = priority;
+    this.user = user;
+    this.doneDate = doneDate;
+  }
+
 
   /**
    * Returns the task id.
@@ -106,6 +131,9 @@ public class TaskDTO {
     return user;
   }
 
+
+  public LocalDate getDoneDate() {return doneDate;}
+
   /**
    * Returns the id of the task status.
    *
@@ -158,6 +186,8 @@ public class TaskDTO {
   public void setStatus(StatusDTO status) {
     this.status = status;
   }
+
+  public void setDoneDate(LocalDate doneDate) {this.doneDate = doneDate;}
 
   /**
    * Updates the task priority.

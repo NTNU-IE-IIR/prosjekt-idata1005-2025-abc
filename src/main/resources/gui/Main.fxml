@@ -101,10 +101,10 @@
                             </ImageView>
                         </graphic>
                     </Button>
-                    <Button fx:id ="doneTasksBtn" text="Show closed tasks">
+                    <Button  fx:id="doneTasksBtn" text="Show closed tasks" style="-fx-background-color: #f6f6f6">
                         <graphic>
-                            <ImageView fitHeight="14" preserveRatio="true">
-                                <Image url="@../icons/double-check-icon.png" />
+                            <ImageView fitHeight="20" preserveRatio="true">
+                                <Image url="@../icons/closed-done.png" />
                             </ImageView>
                         </graphic>
                     </Button>
@@ -117,10 +117,10 @@
                 <!-- Task list -->
                 <VBox VBox.vgrow="ALWAYS">
                     <HBox spacing="10" styleClass="sort-order">
-                        <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick" prefWidth="500">Description</Label>
-                        <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick" prefWidth="180">Status</Label>
-                        <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick" prefWidth="140">Priority</Label>
-                        <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick" prefWidth="240">Owner</Label>
+                        <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick" prefWidth="500" text="Description"/>
+                        <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick" prefWidth="180" text="Status" />
+                        <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick" prefWidth="140" text="Priority"/>
+                        <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick" prefWidth="240" text="Owner"/>
                     </HBox>
                     <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" prefWidth="1230"/>
                 </VBox>

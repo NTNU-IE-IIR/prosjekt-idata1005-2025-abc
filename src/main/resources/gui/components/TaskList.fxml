@@ -8,24 +8,57 @@
 
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-<HBox fx:id="container" spacing="10"  xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml" styleClass="task-wrapper">
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml">
 
-    <HBox fx:id="taskDescriptionContainer" styleClass="task-element-wrapper, task-element-description" alignment="CENTER_LEFT">
-        <Label fx:id="taskDescription" />
+    <HBox fx:id="container" spacing="10" styleClass="task-wrapper">
+
+        <HBox fx:id="taskDescriptionContainer" styleClass="task-element-wrapper, task-element-description" alignment="CENTER_LEFT">
+            <Label fx:id="taskDescription" />
+        </HBox>
+
+        <ComboBox fx:id="taskStatusDropdown" styleClass="task-dropdown, task-status" />
+
+        <ComboBox fx:id="taskPriorityDropdown" styleClass="task-dropdown, task-priority"/>
+
+        <ComboBox fx:id="taskOwnerDropdown" styleClass="task-dropdown, task-owner" />
+
+        <Button fx:id="deleteTaskButton" styleClass="task-icon-button" prefHeight="46">
+            <graphic>
+                <ImageView fitHeight="20" preserveRatio="true">
+                    <Image url="@../../icons/delete-icon.png" />
+                </ImageView>
+            </graphic>
+        </Button>
     </HBox>
 
-    <ComboBox fx:id="taskStatusDropdown" styleClass="task-dropdown, task-status" />
+    <HBox fx:id="closedContainer" spacing="10" styleClass="task-wrapper">
+        <HBox fx:id="closedTaskDescriptionContainer" styleClass="task-element-wrapper, task-element-description" alignment="CENTER_LEFT">
+            <Label fx:id="closedTaskDescription" />
+        </HBox>
 
-    <ComboBox fx:id="taskPriorityDropdown" styleClass="task-dropdown, task-priority"/>
+        <HBox styleClass="closed-task-wrapper, task-doneDate" >
+            <Label fx:id="doneDate" />
+        </HBox>
 
-    <ComboBox fx:id="taskOwnerDropdown" styleClass="task-dropdown, task-owner" />
+        <HBox styleClass="closed-task-wrapper, task-priority" >
+            <Label fx:id="closedPriority">
+                <graphic>
+                    <ImageView fx:id="closedPriorityImage" fitHeight="20" preserveRatio="true"/>
+                </graphic>
+            </Label>
+        </HBox>
 
-    <Button fx:id="deleteTaskButton" styleClass="task-icon-button" prefHeight="46">
-        <graphic>
-            <ImageView fitHeight="20" preserveRatio="true">
-                <Image url="@../../icons/delete-icon.png" />
-            </ImageView>
-        </graphic>
-    </Button>
-</HBox>
+        <HBox styleClass="closed-task-wrapper, task-owner" >
+            <Label fx:id="closedOwner" >
+            <graphic>
+                <ImageView fitHeight="20" preserveRatio="true">
+                    <Image url="@../../icons/person-icon.png"/>
+                </ImageView>
+            </graphic>
+            </Label>
+        </HBox>
+
+    </HBox>
+
+</AnchorPane>

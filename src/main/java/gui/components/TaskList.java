@@ -18,6 +18,7 @@ import utils.Logger;
 import utils.Message;
 import utils.MessageTypeEnum;
 
+import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Objects;
@@ -25,13 +26,14 @@ import java.util.function.Consumer;
 
 
 public class TaskList extends ListCell<TaskDTO> {
-  @FXML private Label taskDescription;
-  @FXML private HBox taskDescriptionContainer;
-  @FXML private HBox container;
+  @FXML private Label taskDescription, closedTaskDescription, doneDate, closedPriority, closedOwner;
+  @FXML private HBox taskDescriptionContainer, closedTaskDescriptionContainer;
+  @FXML private HBox container, closedContainer;
   @FXML private ComboBox<StatusDTO> taskStatusDropdown;
   @FXML private ComboBox<PriorityDTO> taskPriorityDropdown;
   @FXML private ComboBox<UserDTO> taskOwnerDropdown;
   @FXML private Button deleteTaskButton;
+  @FXML private ImageView closedPriorityImage;
 
   private final HouseholdDTO household;
   private SimpleBooleanProperty isProgrammaticChange; // Guard flag
@@ -71,56 +73,7 @@ public class TaskList extends ListCell<TaskDTO> {
       }
     }
 
-    private Image createIcon(SelectOption item) throws FileNotFoundException {
-      // Build iconPath depending on runtime type
-      String iconPath = "/icons";
-      switch (item) {
-        case StatusDTO statusDTO -> {
-          switch (statusDTO.getId()) {
-            case 1:
-              iconPath += "/done-icon.png";
-              break;
-            case 2:
-              iconPath += "/working-on-it-icon.png";
-              break;
-            case 3:
-              iconPath += "/not-started-icon.png";
-              break;
-            case -1:
-              iconPath += "/abc-logo.png";
-              break;
-          }
-        }
-        case PriorityDTO priorityDTO -> {
-          switch (priorityDTO.getId()) {
-            case 1:
-              iconPath += "/priority-low.png";
-              break;
-            case 2:
-              iconPath += "/priority-medium.png";
-              break;
-            case 3:
-              iconPath += "/priority-high.png";
-              break;
-            case 4:
-              iconPath += "/priority-critical.png";
-              break;
-            case -1:
-              iconPath += "/abc-logo.png";
-              break;
-          }
-        }
-        case UserDTO userDTO -> iconPath += "/person-icon.png";
-        default -> throw new IllegalStateException("Unexpected value: " + item);
-      }
-      var resourceUrl = getClass().getResource(iconPath);
-      if (resourceUrl == null) {
-        // Throw exception if the icon cannot be loaded
-        throw new FileNotFoundException("Could not load icon from path: " + iconPath);
-      }
-      // If the resource is found, return the Image
-      return new Image(resourceUrl.toExternalForm());
-    }
+
 
     public void forceUpdate(T item, boolean empty) {
       updateItem(item, empty);
@@ -181,7 +134,13 @@ public class TaskList extends ListCell<TaskDTO> {
       currentTask = null;
     } else {
       currentTask = task;
-      taskDescription.setText(task.getDescription() != null ? task.getDescription() : "N/A");
+
+      // Closed done tasks
+      if(currentTask.getStatusId() == 4){
+        displayClosedTasks(task);
+        setGraphic(closedContainer);
+        return;
+      }
 
       String[] dropDownPaint = comboBoxPaint(task);
       taskStatusDropdown.setStyle("-fx-background-color:"+dropDownPaint[0]+";");
@@ -202,6 +161,7 @@ public class TaskList extends ListCell<TaskDTO> {
         ? task.getUser()
         : unassignedUser;
 
+      taskDescription.setText(task.getDescription() != null ? task.getDescription() : "N/A");
       taskStatusDropdown.setValue(task.getStatus());
       taskPriorityDropdown.setValue(task.getPriority());
       taskOwnerDropdown.setValue(defaultOwner);
@@ -216,6 +176,23 @@ public class TaskList extends ListCell<TaskDTO> {
       // Re-allow the events
       isProgrammaticChange.setValue(false);
       setGraphic(container);
+    }
+  }
+
+  private void displayClosedTasks(TaskDTO task){
+    closedTaskDescription.setText(task.getDescription());
+    doneDate.setText(task.getDoneDate().toString());
+    closedPriority.setText(task.getPriority().getName());
+
+    UserDTO defaultOwner = (task.getUser() != null)
+      ? task.getUser()
+      : unassignedUser;
+
+    closedOwner.setText(defaultOwner.getName());
+    try {
+      closedPriorityImage.setImage(createIcon(task.getPriority()));
+    } catch (FileNotFoundException ex) {
+      Logger.error("(TaskList.displayClosedTasks) file not found: " + ex.getMessage());
     }
   }
 
@@ -253,6 +230,56 @@ public class TaskList extends ListCell<TaskDTO> {
     return styles;
   }
 
+  private Image createIcon(SelectOption item) throws FileNotFoundException {
+    // Build iconPath depending on runtime type
+    String iconPath = "/icons";
+    switch (item) {
+      case StatusDTO statusDTO -> {
+        switch (statusDTO.getId()) {
+          case 1:
+            iconPath += "/done-icon.png";
+            break;
+          case 2:
+            iconPath += "/working-on-it-icon.png";
+            break;
+          case 3:
+            iconPath += "/not-started-icon.png";
+            break;
+          case -1:
+            iconPath += "/abc-logo.png";
+            break;
+        }
+      }
+      case PriorityDTO priorityDTO -> {
+        switch (priorityDTO.getId()) {
+          case 1:
+            iconPath += "/priority-low.png";
+            break;
+          case 2:
+            iconPath += "/priority-medium.png";
+            break;
+          case 3:
+            iconPath += "/priority-high.png";
+            break;
+          case 4:
+            iconPath += "/priority-critical.png";
+            break;
+          case -1:
+            iconPath += "/abc-logo.png";
+            break;
+        }
+      }
+      case UserDTO userDTO -> iconPath += "/person-icon.png";
+      default -> throw new IllegalStateException("Unexpected value: " + item);
+    }
+    var resourceUrl = getClass().getResource(iconPath);
+    if (resourceUrl == null) {
+      // Throw exception if the icon cannot be loaded
+      throw new FileNotFoundException("Could not load icon from path: " + iconPath);
+    }
+    // If the resource is found, return the Image
+    return new Image(resourceUrl.toExternalForm());
+  }
   private void taskUpdate(ObservableValue<? extends SelectOption> observable, SelectOption  oldValue, SelectOption  newValue){
     if (isProgrammaticChange.getValue()) return;
     if(newValue == null) {

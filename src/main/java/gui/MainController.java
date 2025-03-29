@@ -1,6 +1,7 @@
 // Language: java
 package gui;
 
+import com.mysql.cj.log.Log;
 import controllers.TaskDialogFactory;
 import controllers.UserDialogFactory;
 import gui.components.TaskList;
@@ -76,7 +77,6 @@ public class MainController {
     root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/styles/global.css")).toExternalForm());
     dataHandler = new DataHandler();
     isProgrammaticChange = new SimpleBooleanProperty(false);
-
     // Ensure both spacers expand to push elements apart
     HBox.setHgrow(spacer, Priority.ALWAYS);
     HBox.setHgrow(spacer2, Priority.ALWAYS);
@@ -127,6 +127,7 @@ public class MainController {
       taskList.setAll(dataHandler.getClosedTasks(household.getId()));
       originalTaskList = new ArrayList<>(taskList);
       taskTable.refresh();
+      sortTaskStatus.setText("Date");
     }
   }
 
@@ -339,6 +340,7 @@ public class MainController {
       Toast.showToast(root, new Message<>(MessageTypeEnum.ERROR, "An error occurred: " + e.getMessage()), -1);
     }
     Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Viewing all tasks"), 3000);
+    sortTaskStatus.setText("Status");
   }
 
   public void handleEditTask(Message<TaskDTO> message) {

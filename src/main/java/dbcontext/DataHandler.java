@@ -137,8 +137,6 @@ public class DataHandler {
         return tasks;
     }
 
-
-
     public List<TaskDTO> getAllTasksByHouseHold(int householdId, String userQuery) {
         List<TaskDTO> tasks = new ArrayList<>();
         userQuery = "%" + userQuery + "%"; // <- Enables "like" searching.
@@ -153,7 +151,7 @@ public class DataHandler {
                 "LEFT JOIN status s ON t.statusId = s.id " +
                 "LEFT JOIN priorities p ON t.priorityId = p.id " +
                 "LEFT JOIN users u ON t.ownerId = u.id " +
-                "WHERE t.householdId = ? AND t.description LIKE ? " +
+                "WHERE t.householdId = ? AND t.description LIKE ? AND t.statusId BETWEEN 1 AND 3 " +
                 "ORDER BY t.id DESC";
         try {
             tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId, userQuery);
@@ -161,52 +159,6 @@ public class DataHandler {
             Logger.error("Error fetching tasks: " + e.getMessage());
         }
         return tasks;
-    }
-
-
-    public List<TaskDTO> getLimitedTasks(int householdId, int limit, int offset) {
-        List<TaskDTO> tasks = new ArrayList<>();
-        String query = "SELECT " +
-                "t.id, t.description, " +
-                "h.id AS household_id, h.name AS household_name, " +
-                "s.id AS status_id, s.name AS status_name, " +
-                "p.id AS priority_id, p.name AS priority_name, " +
-                "u.id AS user_id, u.name AS user_name " +
-                "FROM tasks t " +
-                "LEFT JOIN households h ON t.householdId = h.id " +
-                "LEFT JOIN status s ON t.statusId = s.id " +
-                "LEFT JOIN priorities p ON t.priorityId = p.id " +
-                "LEFT JOIN users u ON t.ownerId = u.id " +
-                "WHERE t.householdId = ? " +
-                "ORDER BY t.id DESC " +
-                "LIMIT ? OFFSET ?";
-        try {
-            tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId, limit, offset);
-        } catch (SQLException e) {
-            Logger.error("Error fetching tasks: " + e.getMessage());
-        }
-        return tasks;
-    }
-
-
-    public void updateTask(TaskDTO task) {
-        String query = "UPDATE tasks SET description = ?,statusId = ?, priorityId = ?, ownerId = ? WHERE id = ?";
-        try {
-            int rowsAffected = dbHelper.executeUpdate(
-                    query,
-                    task.getDescription(),
-                    task.getStatusId(),
-                    task.getPriorityId(),
-                    task.getUserId(),
-                    task.getId());
-            if (rowsAffected > 0) {
-                Logger.info("Task updated successfully: " + task.getDescription());
-            } else {
-                Logger.error("Failed to update task: " + task.getDescription());
-            }
-        } catch (SQLException e) {
-            Logger.error("Error updating task : " + e.getMessage());
-        }
     }
 
     public Message<Integer> addUser(UserDTO user) {
@@ -264,7 +216,7 @@ public class DataHandler {
           "LEFT JOIN status s ON t.statusId = s.id " +
           "LEFT JOIN priorities p ON t.priorityId = p.id " +
           "LEFT JOIN users u ON t.ownerId = u.id " +
-          "WHERE t.householdId = ? AND u.id = ? " +
+          "WHERE t.householdId = ? AND u.id = ? AND t.statusId BETWEEN 1 AND 3 " +
           "ORDER BY t.id DESC";
         try {
             List<TaskDTO> result = dbHelper.executeSelect(query, TaskDTO.class,user.getHousehold().getId(), user.getId());
@@ -361,6 +313,7 @@ public class DataHandler {
         Message<Void> message = null;
         String query = "SELECT " +
                 "t.id, t.description, " +
+                "t.doneDate, " +
                 "h.id AS household_id, h.name AS household_name, " +
                 "s.id AS status_id, s.name AS status_name, " +
                 "p.id AS priority_id, p.name AS priority_name, " +

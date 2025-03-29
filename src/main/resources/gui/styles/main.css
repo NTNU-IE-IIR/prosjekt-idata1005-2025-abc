@@ -246,6 +246,15 @@
 .task-owner{
     -fx-pref-width: 240px;
 }
+.task-doneDate{
+    -fx-pref-width: 180px;
+}
+.closed-task-wrapper{
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 16px;
+    -fx-padding:12px 10px;
+    -fx-background-color: #F6F6F6;
+}
 
 .task-icon-button{
     -fx-background-color: #F6F6F6;

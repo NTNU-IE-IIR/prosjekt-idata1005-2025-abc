@@ -6,6 +6,7 @@ import utils.Message;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,8 +135,17 @@ public class DatabaseHelper {
           field.setAccessible(true);
           String columnName = field.getName(); // Assume column name matches DTO field name
 
+          // Handle date type
+          if(field.getType().equals(LocalDate.class)){
+            try {
+              Object value = rs.getObject(columnName, LocalDate.class);
+              if (value != null) {
+                field.set(instance, value);
+              }
+            }catch (SQLException ignored) { /* Ignore missing columns */ }
+          }
           // Handle simple data types
-          if (isSimpleType(field.getType())) {
+          else if (isSimpleType(field.getType())) {
             try {
               Object value = rs.getObject(columnName);
               if (value != null) {
@@ -182,7 +192,6 @@ public class DatabaseHelper {
       for (Field field : fields) {
         field.setAccessible(true);
         String columnName = prefix + "_" + field.getName(); // Expect SQL alias: household_id, household_name
-
         try {
           Object value = rs.getObject(columnName);
           if (value != null) {
