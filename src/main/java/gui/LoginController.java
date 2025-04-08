@@ -93,7 +93,7 @@ public class LoginController {
       Scene mainScene = new Scene(root, 1200, 800);
       Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
       stage.setScene(mainScene);
-      stage.setTitle("Main Application");
+      stage.setTitle("Dashboard: "+household.getName());
 
       stage.setMaximized(true);
       stage.setWidth(Screen.getPrimary().getVisualBounds().getWidth());
