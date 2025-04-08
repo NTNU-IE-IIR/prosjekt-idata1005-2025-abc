@@ -289,6 +289,14 @@
     -fx-effect: none;
     -fx-background-insets: 0;
 }
+.footer{
+    -fx-padding: 18px
+}
+.footer .label{
+    -fx-text-fill: #333333;
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-font-size: 16px;
+}
 
 .toast{
     -fx-background-color: #D8FBD8;
@@ -296,3 +304,4 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
     -fx-padding: 10;
 }
+

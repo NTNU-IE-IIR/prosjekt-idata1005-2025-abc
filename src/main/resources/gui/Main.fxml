@@ -126,8 +126,8 @@
                 </VBox>
 
                 <!-- Footer -->
-                <HBox>
-                    <Label>Footer</Label>
+                <HBox styleClass="footer" alignment="CENTER">
+                    <Label > 2025 ABC | All rights reserved</Label>
                 </HBox>
             </VBox>
         </HBox>
