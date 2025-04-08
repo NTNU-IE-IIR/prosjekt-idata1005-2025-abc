@@ -1,10 +1,12 @@
 package gui.components;
 
+import gui.helpers.TaskDialogFactory;
 import dto.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -18,10 +20,10 @@ import utils.Logger;
 import utils.Message;
 import utils.MessageTypeEnum;
 
-import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 
@@ -32,7 +34,7 @@ public class TaskList extends ListCell<TaskDTO> {
   @FXML private ComboBox<StatusDTO> taskStatusDropdown;
   @FXML private ComboBox<PriorityDTO> taskPriorityDropdown;
   @FXML private ComboBox<UserDTO> taskOwnerDropdown;
-  @FXML private Button deleteTaskButton;
+  @FXML private Button deleteTaskButton, taskDescriptionEdit;
   @FXML private ImageView closedPriorityImage;
 
   private final HouseholdDTO household;
@@ -142,16 +144,17 @@ public class TaskList extends ListCell<TaskDTO> {
         return;
       }
 
+      // Paint different components
       String[] dropDownPaint = comboBoxPaint(task);
       taskStatusDropdown.setStyle("-fx-background-color:"+dropDownPaint[0]+";");
       taskPriorityDropdown.setStyle("-fx-background-color:"+dropDownPaint[1]+";");
       taskOwnerDropdown.setStyle("-fx-background-color:"+dropDownPaint[2]+";");
 
+      // Paint the left hand-side border of the row.
       if(Objects.equals(dropDownPaint[0], "#F6F6F6")) // <- Hard coded until further notice
         taskDescriptionContainer.setStyle("-fx-border-color: #C7C7C7;");
       else
         taskDescriptionContainer.setStyle("-fx-border-color:"+ dropDownPaint[0] +";");
-
 
       // Temporarily ignore events before setValue
       isProgrammaticChange.setValue(true);
@@ -160,6 +163,9 @@ public class TaskList extends ListCell<TaskDTO> {
       UserDTO defaultOwner = (task.getUser() != null)
         ? task.getUser()
         : unassignedUser;
+
+      // Setup edit task description
+      taskDescriptionEdit.setOnAction(this::setupDescriptionEdit);
 
       taskDescription.setText(task.getDescription() != null ? task.getDescription() : "N/A");
       taskStatusDropdown.setValue(task.getStatus());
@@ -280,6 +286,23 @@ public class TaskList extends ListCell<TaskDTO> {
     // If the resource is found, return the Image
     return new Image(resourceUrl.toExternalForm());
   }
+
+  private void setupDescriptionEdit(ActionEvent actionEvent) {
+    String oldDescription = currentTask.getDescription();
+
+    // Create edit description dialog
+    Optional<TaskDTO> result =
+      TaskDialogFactory.createEditTaskDescriptionDialog(currentTask, household).showAndWait();
+
+    // Handle edit description submit
+    result.ifPresent(task -> {
+    String newDescription = task.getDescription();
+      String stringMessage = "Status updated: " + oldDescription + " → " + newDescription;
+      Message<TaskDTO> message = new Message<>(MessageTypeEnum.SUCCESS, stringMessage, task);
+      onChange.accept(message);
+    });
+  }
+
   private void taskUpdate(ObservableValue<? extends SelectOption> observable, SelectOption  oldValue, SelectOption  newValue){
     if (isProgrammaticChange.getValue()) return;
     if(newValue == null) {

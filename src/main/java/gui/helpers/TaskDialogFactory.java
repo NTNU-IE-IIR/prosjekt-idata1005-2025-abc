@@ -1,13 +1,11 @@
 // Language: java
-package controllers;
+package gui.helpers;
 
 import dto.HouseholdDTO;
 import dto.PriorityDTO;
-import dto.StatusDTO;
 import dto.TaskDTO;
 import dto.UserDTO;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -28,61 +26,40 @@ public class TaskDialogFactory extends DialogFactory {
      *
      * @param currentTask the task being edited
      * @param household   the associated household
-     * @param statuses    the list of available task statuses
-     * @param priorities  the list of available priorities
-     * @param users       the list of available users
      * @return a Dialog that returns an updated TaskDTO on success, or null on cancel
      */
-    public static Dialog<TaskDTO> createEditTaskDialog(TaskDTO currentTask, HouseholdDTO household,
-                                                       List<StatusDTO> statuses, List<PriorityDTO> priorities,
-                                                       List<UserDTO> users) {
-        Dialog<TaskDTO> dialog = createBasicDialog("Edit Task", "Enter task details");
+    public static Dialog<TaskDTO> createEditTaskDescriptionDialog(TaskDTO currentTask, HouseholdDTO household) {
+        Dialog<TaskDTO> dialog = createBasicDialog("Edit description", "Enter task details");
         GridPane grid = createDialogGrid();
 
         TextField taskField = new TextField(currentTask.getDescription());
-        taskField.setPromptText("New task name");
-
-        ComboBox<PriorityDTO> priorityCombo = new ComboBox<>();
-        priorityCombo.getItems().addAll(priorities);
-        priorityCombo.setValue(currentTask.getPriority());
-
-        ComboBox<StatusDTO> statusCombo = new ComboBox<>();
-        statusCombo.getItems().addAll(statuses);
-        statusCombo.setValue(currentTask.getStatus());
-
-        ComboBox<UserDTO> userCombo = new ComboBox<>();
-        userCombo.getItems().addAll(users);
-        userCombo.setValue(currentTask.getUser());
-
         Label errorLabel = new Label();
 
-        grid.add(new Label("Task:"), 0, 0);
+        // Configure grid
+        grid.add(new Label("Description:"), 0, 0);
         grid.add(taskField, 1, 0);
-        grid.add(new Label("Priority:"), 0, 1);
-        grid.add(priorityCombo, 1, 1);
-        grid.add(new Label("Status:"), 0, 2);
-        grid.add(statusCombo, 1, 2);
-        grid.add(new Label("Member:"), 0, 3);
-        grid.add(userCombo, 1, 3);
-        grid.add(errorLabel, 1, 4);
+        grid.add(errorLabel, 0, 1, 3, 1);
 
+        // Setup buttons
         ButtonType editButton = new ButtonType("Edit", ButtonBar.ButtonData.OK_DONE);
         setupDialogButtons(dialog, editButton);
         dialog.getDialogPane().setContent(grid);
 
+        // Middleware to capture any issues / invalid attempts before submitting
         dialog.getDialogPane().lookupButton(editButton).addEventFilter(ActionEvent.ACTION, e -> {
             if (taskField.getText().trim().isEmpty()) {
-                errorLabel.setText("Task name cannot be empty!");
+                errorLabel.setText("Description cannot be empty!");
                 e.consume();
             } else {
                 errorLabel.setText("");
             }
         });
 
+        // Converts input data to actual object to be used
         dialog.setResultConverter(button -> {
             if (button == editButton) {
                 return new TaskDTO(currentTask.getId(), taskField.getText(), household,
-                        statusCombo.getValue(), priorityCombo.getValue(), userCombo.getValue());
+                  currentTask.getStatus(), currentTask.getPriority(), currentTask.getUser());
             }
             return null;
         });
@@ -119,7 +96,7 @@ public class TaskDialogFactory extends DialogFactory {
         grid.add(priorityCombo, 1, 1);
         grid.add(new Label("Member:"), 0, 2);
         grid.add(userCombo, 1, 2);
-        grid.add(errorLabel, 1, 3);
+        grid.add(errorLabel, 0, 3, 3, 1);
 
         ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
         setupDialogButtons(dialog, addButton);
@@ -128,6 +105,9 @@ public class TaskDialogFactory extends DialogFactory {
         dialog.getDialogPane().lookupButton(addButton).addEventFilter(ActionEvent.ACTION, e -> {
             if (descriptionField.getText().trim().isEmpty()) {
                 errorLabel.setText("Description cannot be empty!");
+                e.consume();
+            } else if (priorityCombo.getValue() == null) {
+                errorLabel.setText("Priority cannot be empty!");
                 e.consume();
             } else {
                 errorLabel.setText("");

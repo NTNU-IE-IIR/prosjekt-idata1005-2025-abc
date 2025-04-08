@@ -1,10 +1,9 @@
 // Language: java
-package controllers;
+package gui.helpers;
 
 import dto.HouseholdDTO;
 import dto.UserDTO;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;

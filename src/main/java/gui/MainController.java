@@ -1,9 +1,8 @@
 // Language: java
 package gui;
 
-import com.mysql.cj.log.Log;
-import controllers.TaskDialogFactory;
-import controllers.UserDialogFactory;
+import gui.helpers.TaskDialogFactory;
+import gui.helpers.UserDialogFactory;
 import gui.components.TaskList;
 import gui.components.UserList;
 import dbcontext.DataHandler;

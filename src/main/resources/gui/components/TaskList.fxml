@@ -14,7 +14,15 @@
     <HBox fx:id="container" spacing="10" styleClass="task-wrapper">
 
         <HBox fx:id="taskDescriptionContainer" styleClass="task-element-wrapper, task-element-description" alignment="CENTER_LEFT">
-            <Label fx:id="taskDescription" />
+            <Label fx:id="taskDescription"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="taskDescriptionEdit" styleClass="task-edit-button">
+                <graphic>
+                    <ImageView fitHeight="20" preserveRatio="true">
+                        <Image url="@../../icons/edit-icon.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
 
         <ComboBox fx:id="taskStatusDropdown" styleClass="task-dropdown, task-status" />

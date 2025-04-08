@@ -1,5 +1,5 @@
 // Language: java
-package controllers;
+package gui.helpers;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;

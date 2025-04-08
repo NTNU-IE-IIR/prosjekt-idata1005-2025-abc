@@ -229,7 +229,7 @@
     -fx-pref-width: 500px;
     -fx-border-width: 0 0 0 4px;
     -fx-border-color: #C7C7C7;
-    -fx-padding: 0 0 0 10px;
+    -fx-padding: 0 6px 0 10px;
 }
 .task-element-description .label{
     -fx-font-family: "Inter 18pt Medium";
@@ -264,6 +264,18 @@
 .task-icon-button:hover{
     -fx-background-color:#DEDEDE;
 }
+
+.task-edit-button{
+    -fx-background-color: transparent;
+    -fx-border-color-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0px 9px;
+}
+
+.task-edit-button:hover {
+    -fx-background-color: #DEDEDE;
+}
+
 
 .sort-order{
     -fx-border-width: 0 0 2px 0;
@@ -304,4 +316,5 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
     -fx-padding: 10;
 }
+
 
