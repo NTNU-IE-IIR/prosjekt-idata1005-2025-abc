@@ -292,7 +292,7 @@ public class DataHandler {
     }
 
     public Message<Void> closeDoneTasks(TaskDTO doneTasks) {
-        Message<Void> message = null;
+        Message<Void> message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully closed task");
         String query = "UPDATE tasks SET statusId = 4, doneDate = ? WHERE id = ?";
         try{
             int rowsAffected = dbHelper.executeUpdate(query, new java.sql.Date(System.currentTimeMillis()) ,doneTasks.getId());

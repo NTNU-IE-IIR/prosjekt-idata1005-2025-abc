@@ -136,19 +136,19 @@ public class MainController {
   }
 
   private void handleCloseTasks(ActionEvent actionEvent) {
-    List<TaskDTO> doneTasks = new ArrayList<>();
-    taskList.forEach(task -> {
-      if(task.getStatus().getId() == 1){
-        doneTasks.add(task);
-      }
-    });
+    List<TaskDTO> doneTasks = taskList.stream()
+      .filter(t -> t.getStatusId() == 1)
+      .toList();
+
+    if(doneTasks.isEmpty()){
+      Toast.showToast(root, new Message<>(MessageTypeEnum.WARNING, "No tasks to close"), 3000);
+      return;
+    }
+
     for(TaskDTO task : doneTasks){
       Message<Void> queryResult = dataHandler.closeDoneTasks(task);
-      if(doneTasks.isEmpty()){
-        Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "No tasks to close"), 3000);
-      }else{
-        Toast.showToast(root, new Message<>(MessageTypeEnum.INFO, "Tasks closed successfully"),3000);
-      }
+      if(queryResult.getType().equals(MessageTypeEnum.SUCCESS))
+        Toast.showToast(root, new Message<>(MessageTypeEnum.SUCCESS, "Tasks closed successfully"),3000);
     }
     taskList.setAll(dataHandler.getAllTasksByHouseHold(household.getId()));
     originalTaskList = new ArrayList<>(taskList);
