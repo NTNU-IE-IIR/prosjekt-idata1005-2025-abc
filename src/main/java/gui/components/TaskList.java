@@ -2,6 +2,7 @@ package gui.components;
 
 import gui.helpers.TaskDialogFactory;
 import dto.*;
+import gui.helpers.TooltipHelper;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -171,6 +172,14 @@ public class TaskList extends ListCell<TaskDTO> {
       taskStatusDropdown.setValue(task.getStatus());
       taskPriorityDropdown.setValue(task.getPriority());
       taskOwnerDropdown.setValue(defaultOwner);
+
+      // Set tooltips
+      TooltipHelper.bindTooltip(taskDescription, taskDescription.getText());
+      TooltipHelper.bindTooltip(taskDescriptionEdit, "Edit task description");
+      TooltipHelper.bindTooltip(taskStatusDropdown, "Change task status");
+      TooltipHelper.bindTooltip(taskPriorityDropdown, "Change task priority");
+      TooltipHelper.bindTooltip(taskOwnerDropdown, "Change task owner");
+      TooltipHelper.bindTooltip(deleteTaskButton, "Delete task");
 
       // Force the cell to update on initial load <-- Work around for javaFx limitations.
       Platform.runLater(()->{

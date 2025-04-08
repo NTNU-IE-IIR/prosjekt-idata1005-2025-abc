@@ -2,7 +2,6 @@
     -fx-background-color: white;
     -fx-font-family: "Inter";
     -fx-font-size: 16px;
-    -fx-font-smoothing-type: gray;
 }
 
 .top-bar {
@@ -196,8 +195,6 @@
     -fx-background-color: transparent;
 }
 
-
-
 .task-list .list-cell:filled:selected .task-wrapper Label {
     -fx-text-fill: #333333; /* Override the default selection text color */
 }
@@ -210,11 +207,14 @@
     -fx-font-family: "Inter 18pt Medium";
     -fx-font-size: 16px;
     -fx-text-fill: #333333;
-    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-color: transparent;
     -fx-border-radius: 0;
 }
+.task-dropdown:hover{
+    -fx-opacity: 0.76;
+}
+
 
 .task-dropdown:focused {
     -fx-focus-color: transparent;       /* Removes the solid focus color */
@@ -235,6 +235,7 @@
     -fx-font-family: "Inter 18pt Medium";
     -fx-font-size: 16px;
     -fx-text-fill: #333333;
+    -fx-cursor:hand;
 }
 
 .task-status{
@@ -288,6 +289,7 @@
     -fx-font-family: "Inter 18pt Medium";
     -fx-font-size: 18px;
     -fx-text-fill: #333333;
+    -fx-cursor: hand;
 }
 
 /* Remove focus styling from the ListView and some of its internals */

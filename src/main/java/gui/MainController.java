@@ -2,6 +2,7 @@
 package gui;
 
 import gui.helpers.TaskDialogFactory;
+import gui.helpers.TooltipHelper;
 import gui.helpers.UserDialogFactory;
 import gui.components.TaskList;
 import gui.components.UserList;
@@ -107,6 +108,18 @@ public class MainController {
       userTable.prefHeightProperty().bind(Bindings.size(userList).multiply(70).add(20));
       taskTable.prefHeightProperty().bind(Bindings.size(taskList).multiply(60).add(100));
     });
+
+    // Apply tooltip
+    TooltipHelper.bindTooltip(addTaskBtn, "Click to add a new task");
+    TooltipHelper.bindTooltip(distributeBtn,
+      "Automatically distribute unassigned tasks to people. " +
+        "Higher priority will be considered first.");
+    TooltipHelper.bindTooltip(closeDoneBtn, "Close all tasks that have status \"Done\"");
+    TooltipHelper.bindTooltip(addUserBtn, "Add a new person to the household");
+    TooltipHelper.bindTooltip(viewAllTasks, "View all tasks");
+    TooltipHelper.bindTooltip(logoutButton, "Logout of household");
+    TooltipHelper.bindTooltip(doneTasksBtn, "Show all completed tasks");
+
 
     // Register button event handlers.
     addTaskBtn.setOnAction(this::handleAddTask);
