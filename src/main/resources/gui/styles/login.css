@@ -1,17 +1,10 @@
 .root {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f0f4f8, #e8eef2);
     -fx-font-family: "Inter", sans-serif;
 }
 
 .logo-container{
     -fx-padding: 20px;
     -fx-background-radius: 12px;
-}
-
-.login-page{
-    -fx-padding: 30px;
-    -fx-spacing: 15px;
-    -fx-background-radius: 10;
 }
 
 .login-container{
