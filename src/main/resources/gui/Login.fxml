@@ -5,31 +5,36 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="root" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20" styleClass="login-container"
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox fx:id="root" alignment="CENTER"  spacing="20" styleClass="login-page"
       xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.LoginController">
-    <VBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="600.0">
-        <Label alignment="CENTER" text="Welcome to HOME" styleClass="title-label">
-            <font>
-                <Font name="Inter Semi Bold" size="18.0"/>
-            </font>
-        </Label>
-        <Label alignment="CENTER" text="Household Organization and Management Engine" styleClass="title-label">
-            <font>
-                <Font name="Inter Semi Bold" size="14.0"/>
-            </font>
-        </Label>
-    </VBox>
-    <VBox prefHeight="200.0" prefWidth="300.0" spacing="14" alignment="CENTER">
-        <Label text="Connect to a household">
-            <font>
-                <Font name="Inter Semi Bold" size="18.0"/>
-            </font>
-        </Label>
-        <TextField fx:id="usernameField" styleClass="short-text-field" promptText="Username"/>
-        <PasswordField fx:id="passwordField" styleClass="short-text-field" promptText="Password"/>
-        <HBox spacing="14" alignment="CENTER">
-            <Button onAction="#handleLogin" text="Login"/>
-            <CheckBox fx:id="checkRememberMe" text="Remember me" />
+
+    <VBox maxWidth="400" styleClass="login-container">
+        <!-- ABC Logo -->
+        <HBox alignment="CENTER">
+            <VBox styleClass="logo-container">
+                <ImageView fitHeight="80" preserveRatio="true" >
+                    <Image url="@../icons/abc-logo.png"/>
+                </ImageView>
+            </VBox>
         </HBox>
+
+        <!-- Login Control -->
+        <VBox spacing="14" alignment="CENTER">
+            <!-- Login Label -->
+            <Label styleClass="title-label">
+                Connect to a household
+            </Label>
+            <!-- Login fields -->
+            <TextField fx:id="usernameField" styleClass="short-text-field" promptText="Username"/>
+            <PasswordField fx:id="passwordField" styleClass="short-text-field" promptText="Password"/>
+            <!-- Login buttons -->
+            <HBox spacing="14" alignment="CENTER">
+                <Button onAction="#handleLogin" text="Login"/>
+                <CheckBox fx:id="checkRememberMe" text="Remember me" />
+            </HBox>
+        </VBox>
     </VBox>
+
 </VBox>

@@ -439,14 +439,14 @@ public class MainController {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
     Parent loginRoot = loader.load();
 
-    Scene loginScene = new Scene(loginRoot, 800, 500);
+    Scene loginScene = new Scene(loginRoot, 920, 600);
     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     stage.setScene(loginScene);
     stage.setTitle("Login Page");
 
     stage.setMaximized(false);
-    stage.setWidth(800);
-    stage.setHeight(500);
+    stage.setWidth(920);
+    stage.setHeight(600);
 
     stage.centerOnScreen();
     stage.show();

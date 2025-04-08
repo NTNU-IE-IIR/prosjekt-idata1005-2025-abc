@@ -1,24 +1,40 @@
 .root {
-    -fx-background-color: linear-gradient(to bottom, #83a4d4, #b6fbff);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f0f4f8, #e8eef2);
     -fx-font-family: "Inter", sans-serif;
 }
 
+.logo-container{
+    -fx-padding: 20px;
+    -fx-background-radius: 12px;
+}
 
-.login-container {
-    -fx-background-color: #ffffff;
+.login-page{
     -fx-padding: 30px;
     -fx-spacing: 15px;
     -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 0);
 }
 
+.login-container{
+    -fx-background-color: white;
+    -fx-padding: 38px 18px;
+    -fx-background-radius: 12px;
+
+    /* Subtle drop shadow example */
+    -fx-effect: dropshadow(
+            three-pass-box,       /* or "gaussian" */
+            rgba(0, 0, 0, 0.15),  /* color and opacity of the shadow */
+            10,                   /* radius (blur) */
+            0.0,                  /* spread (0 - no spread, 1 - maximum spread) */
+            0,                    /* offsetX (horizontal shift) */
+            2                     /* offsetY (vertical shift) */
+    );
+}
 
 .label {
     -fx-font-size: 28px;
     -fx-text-fill: #333333;
     -fx-font-weight: bold;
 }
-
 
 .text-field, .password-field {
     -fx-pref-width: 300px;
@@ -30,7 +46,6 @@
     -fx-background-radius: 5px;
     -fx-font-size: 16px;
 }
-
 
 .button {
     -fx-background-color: #007ACC;
@@ -45,7 +60,6 @@
     -fx-background-color: #005999;
 }
 
-
 .error-label {
     -fx-background-color: #ffcccc;
     -fx-text-fill: #a00;
@@ -55,12 +69,15 @@
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
 }
+
 .title-label {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
+    -fx-font-family: "Inter 28pt Medium";
+    -fx-font-size: 28px;
     -fx-text-alignment: center;
     -fx-wrap-text: true;
+    -fx-text-fill: #333333;
 }
+
 .short-text-field {
     -fx-pref-width: 300px; /* Set a fixed width */
     -fx-max-width: 300px;  /* Prevent resizing */
