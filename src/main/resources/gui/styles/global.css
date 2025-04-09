@@ -85,6 +85,10 @@
     -fx-background-color: transparent;
 }
 
-
+.text-16{
+    -fx-font-size: 16px;
+    -fx-font-family: "Inter 18pt Medium";
+    -fx-text-fill: #333333;
+}
 
 

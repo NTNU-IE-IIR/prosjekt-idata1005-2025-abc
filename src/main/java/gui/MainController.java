@@ -54,6 +54,8 @@ public class MainController {
   @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
   @FXML private Region spacer;  // Reference to the first spacer
   @FXML private Region spacer2; // Reference to the second spacer
+  @FXML private HBox emptyTaskTable;
+  @FXML private VBox populatedTaskTable;
 
   private DataHandler dataHandler;
   private HouseholdDTO household;
@@ -90,6 +92,8 @@ public class MainController {
 
     taskTable.setFixedCellSize(60);
     taskTable.setCellFactory(param -> new TaskList(statusList, priorityList, userList, household, isProgrammaticChange, this::handleEditTask, this::handleDeleteTask));
+
+
 
     Platform.runLater(() -> {
       statusList = FXCollections.observableArrayList(dataHandler.getAllStatus());

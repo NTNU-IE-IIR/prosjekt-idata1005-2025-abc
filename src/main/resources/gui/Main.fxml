@@ -42,7 +42,7 @@
 
     <!-- Right Bar -->
     <right>
-            <VBox alignment="TOP_CENTER" spacing="-3" styleClass="right-bar" SplitPane.resizableWithParent="true" maxWidth="Infinity">
+            <VBox alignment="TOP_CENTER" spacing="-3" styleClass="right-bar" >
                 <HBox spacing="10" styleClass="user-header-container" alignment="CENTER_LEFT">
                     <Label text="People in household" styleClass="user-header-title"/>
                     <Label fx:id="userCount" styleClass="user-count-label"/>
@@ -66,11 +66,14 @@
 
 
     <!-- Table (Center) -->
+
+
     <center>
-        <HBox alignment="CENTER_RIGHT">
+        <ScrollPane fitToHeight="true" style="-fx-background-color: transparent;">
+        <HBox alignment="CENTER_RIGHT" style="-fx-background-color: white;" >
             <VBox>
                 <!-- Toolbar -->
-                <HBox alignment="CENTER_LEFT" spacing="15" styleClass="tool-bar">
+                <HBox alignment="CENTER_LEFT" spacing="15" styleClass="tool-bar" >
                     <HBox alignment="CENTER_LEFT" styleClass="search-container">
                         <ImageView fitHeight="17" preserveRatio="true">
                             <Image url="@../icons/search-icon.png" />
@@ -114,15 +117,22 @@
                     </Button>
                 </HBox>
 
+                <!-- Empty task list -->
+                <HBox fx:id="emptyTaskTable" alignment="CENTER_LEFT" style="-fx-padding: 18px">
+                    <Label styleClass="text-16">
+                        This is an empty table. ts pmo fr fr
+                    </Label>
+                </HBox>
+
                 <!-- Task list -->
-                <VBox VBox.vgrow="ALWAYS">
+                <VBox VBox.vgrow="ALWAYS" fx:id="populatedTaskTable">
                     <HBox spacing="10" styleClass="sort-order">
                         <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick" prefWidth="500" text="Description"/>
                         <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick" prefWidth="180" text="Status" />
                         <Label fx:id="sortTaskPriority" onMouseClicked="#handleSortClick" prefWidth="140" text="Priority"/>
                         <Label fx:id="sortTaskOwner" onMouseClicked="#handleSortClick" prefWidth="240" text="Owner"/>
                     </HBox>
-                    <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" prefWidth="1230"/>
+                    <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" />
                 </VBox>
 
                 <!-- Footer -->
@@ -131,6 +141,7 @@
                 </HBox>
             </VBox>
         </HBox>
+        </ScrollPane>
     </center>
 
 </BorderPane>
