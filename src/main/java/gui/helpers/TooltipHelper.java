@@ -63,7 +63,8 @@ public class TooltipHelper {
 
     // Set up the delays for showing and hiding the tooltip.
     tooltip.setShowDelay(Duration.millis(200));
-    tooltip.setHideDelay(Duration.millis(0));
+    tooltip.setHideDelay(Duration.ZERO);
+    tooltip.setShowDuration(Duration.INDEFINITE);
 
     // Set max width and wrap text
     tooltip.setMaxWidth(330);
