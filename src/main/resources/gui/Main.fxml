@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="root" stylesheets="@styles/main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainController">
+<BorderPane fx:id="root" stylesheets="@styles/main.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainController" style="-fx-background-color: #FFFFFF;">
 
     <!-- Top Bar -->
     <top>
@@ -48,7 +48,13 @@
                     <Label fx:id="userCount" styleClass="user-count-label"/>
                 </HBox>
 
-                <VBox VBox.vgrow="ALWAYS">
+                <HBox fx:id="emptyUserTable" alignment="CENTER_LEFT" visible="false" style="-fx-padding: 18px">
+                    <Label styleClass="text-16" maxWidth="340" wrapText="true">
+                        No people in household. Press "Add people" bellow to add a person.
+                    </Label>
+                </HBox>
+
+                <VBox VBox.vgrow="ALWAYS" fx:id="populatedUserTable">
                     <ListView fx:id="userTable" styleClass="user-list"/>
                 </VBox>
 
@@ -66,11 +72,10 @@
 
 
     <!-- Table (Center) -->
-
-
     <center>
+        <HBox alignment="CENTER_RIGHT">
         <ScrollPane fitToHeight="true" style="-fx-background-color: transparent;">
-        <HBox alignment="CENTER_RIGHT" style="-fx-background-color: white;" >
+        <HBox style="-fx-background-color: white;" >
             <VBox>
                 <!-- Toolbar -->
                 <HBox alignment="CENTER_LEFT" spacing="15" styleClass="tool-bar" >
@@ -117,15 +122,8 @@
                     </Button>
                 </HBox>
 
-                <!-- Empty task list -->
-                <HBox fx:id="emptyTaskTable" alignment="CENTER_LEFT" style="-fx-padding: 18px">
-                    <Label styleClass="text-16">
-                        This is an empty table. ts pmo fr fr
-                    </Label>
-                </HBox>
-
                 <!-- Task list -->
-                <VBox VBox.vgrow="ALWAYS" fx:id="populatedTaskTable">
+                <VBox VBox.vgrow="ALWAYS" fx:id="populatedTaskTable" visible="false">
                     <HBox spacing="10" styleClass="sort-order">
                         <Label fx:id="sortTaskDescription" onMouseClicked="#handleSortClick" prefWidth="500" text="Description"/>
                         <Label fx:id="sortTaskStatus" onMouseClicked="#handleSortClick" prefWidth="180" text="Status" />
@@ -135,13 +133,17 @@
                     <ListView fx:id="taskTable" styleClass="task-list" focusTraversable="false" />
                 </VBox>
 
-                <!-- Footer -->
-                <HBox styleClass="footer" alignment="CENTER">
-                    <Label > 2025 ABC | All rights reserved</Label>
+                <!-- Empty task list -->
+                <HBox fx:id="emptyTaskTable" alignment="CENTER_LEFT" visible="false" styleClass="empty-table">
+                    <Label styleClass="text-16" >
+                        No tasks to display.
+                    </Label>
                 </HBox>
             </VBox>
         </HBox>
         </ScrollPane>
+        </HBox>
+
     </center>
 
 </BorderPane>

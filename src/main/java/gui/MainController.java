@@ -12,6 +12,7 @@ import gui.components.Toast;
 import javafx.beans.binding.Bindings;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -54,8 +55,8 @@ public class MainController {
   @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
   @FXML private Region spacer;  // Reference to the first spacer
   @FXML private Region spacer2; // Reference to the second spacer
-  @FXML private HBox emptyTaskTable;
-  @FXML private VBox populatedTaskTable;
+  @FXML private HBox emptyTaskTable, emptyUserTable;
+  @FXML private VBox populatedTaskTable, populatedUserTable;
 
   private DataHandler dataHandler;
   private HouseholdDTO household;
@@ -111,6 +112,17 @@ public class MainController {
       userCount.textProperty().bind(Bindings.size(userList).asString());
       userTable.prefHeightProperty().bind(Bindings.size(userList).multiply(70).add(20));
       taskTable.prefHeightProperty().bind(Bindings.size(taskList).multiply(60).add(100));
+
+      // Show default value for task list if it is empty
+      emptyTaskTable.visibleProperty().bind(Bindings.isEmpty(taskList));
+      emptyTaskTable.managedProperty().bind(Bindings.isEmpty(taskList));
+      populatedTaskTable.visibleProperty().bind(Bindings.isNotEmpty(taskList));
+      populatedTaskTable.managedProperty().bind(Bindings.isNotEmpty(taskList));
+
+      // Show default value for user list if it is empty
+      emptyUserTable.visibleProperty().bind(Bindings.isEmpty(userList));
+      emptyUserTable.managedProperty().bind(Bindings.isEmpty(userList));
+      populatedUserTable.visibleProperty().bind(Bindings.isNotEmpty(userList));
     });
 
     // Apply tooltip

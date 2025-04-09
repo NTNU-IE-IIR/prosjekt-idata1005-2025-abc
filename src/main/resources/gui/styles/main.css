@@ -292,6 +292,21 @@
     -fx-cursor: hand;
 }
 
+.empty-table{
+    -fx-padding: 18px;
+
+}
+
+.empty-table .label{
+    -fx-padding: 12px 18px;
+    -fx-background-color:#F6F6F6;
+    -fx-border-width: 1px;
+    -fx-border-color: #DEDEDE;
+    -fx-border-radius:8px;
+    -fx-background-radius:8px;
+}
+
+
 /* Remove focus styling from the ListView and some of its internals */
 #taskTable,
 #taskTable:focused,
