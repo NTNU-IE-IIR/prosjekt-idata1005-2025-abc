@@ -1,6 +1,7 @@
 // Language: java
 package gui;
 
+import dbcontext.DatabaseHelper;
 import gui.helpers.TaskDialogFactory;
 import gui.helpers.TooltipHelper;
 import gui.helpers.UserDialogFactory;
@@ -12,9 +13,9 @@ import gui.components.Toast;
 import javafx.beans.binding.Bindings;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,6 +32,7 @@ import utils.MessageTypeEnum;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -139,13 +141,165 @@ public class MainController {
 
     // Register button event handlers.
     addTaskBtn.setOnAction(this::handleAddTask);
-    distributeBtn.setOnAction(e -> Logger.info("Distribute tasks clicked!"));
+    distributeBtn.setOnAction(this::distributeTasks);
     closeDoneBtn.setOnAction(this::handleCloseTasks);
     addUserBtn.setOnAction(this::handleAddUser);
     searchField.setOnAction(this::handleSearchDescription);
     viewAllTasks.setOnAction(this::handleViewAllTask);
     doneTasksBtn.setOnAction(this::showClosedTasks);
 
+  }
+
+  public void distributeTasks(ActionEvent actionEvent) {
+
+    // Show the toast first (this runs on the JavaFX Application Thread)
+    Toast.showToast(root, new Message<Void>(MessageTypeEnum.SUCCESS, "Distributing tasks..."), -1);
+
+    // Create a Task for heavy processing
+    Task<Void> task = new Task<>() {
+      @Override
+      protected Void call() throws Exception {
+        // --- Begin heavy processing here ---
+        Logger.info("Distributing tasks with arithmetic leveling...");
+
+        // 1. Gather the unassigned tasks.
+        List<TaskDTO> unassignedTasks = taskList.stream()
+          .filter(t -> t.getUser() == null)
+          .toList();
+        int pool = unassignedTasks.size(); // total tasks to distribute
+
+        if (pool == 0) {
+          Logger.info("No unassigned tasks found. Nothing to distribute.");
+          return null;
+        }
+
+        // 2. Get current active task counts per user.
+        Message<List<DatabaseHelper.dbNumberSet>> resultMsg = dataHandler.getActiveTaskPerUser(household.getId());
+        if (resultMsg.getType() != MessageTypeEnum.SUCCESS) {
+          Platform.runLater(() ->
+            Toast.showToast(root, resultMsg, -1));
+          return null;
+        }
+        List<DatabaseHelper.dbNumberSet> userTaskCount = resultMsg.getResult();
+        if (userTaskCount.isEmpty()) {
+          Logger.info("No users found for this household. Cannot distribute tasks.");
+          return null;
+        }
+
+        // --- (A) Store original counts ---
+        Map<Integer, Integer> originalCountMap = new HashMap<>();
+        for (DatabaseHelper.dbNumberSet dbns : userTaskCount) {
+          originalCountMap.put(dbns.getFirst(), dbns.getSecond());
+        }
+
+        // --- (B) Sort them ---
+        userTaskCount.sort(Comparator.comparingInt(DatabaseHelper.dbNumberSet::getSecond));
+
+        Logger.info("\n=== Before Distribution ===");
+        userTaskCount.forEach(e ->
+          Logger.info("User " + e.getFirst() + " | count = " + e.getSecond())
+        );
+
+        // --- (C) Distribution Algorithm ---
+        int n = userTaskCount.size();
+        int i = 0;
+        while (i < n - 1 && pool > 0) {
+          int currentCount = userTaskCount.get(i).getSecond();
+          int groupSize = 1;
+          while (i + groupSize < n &&
+            userTaskCount.get(i + groupSize).getSecond() == currentCount) {
+            groupSize++;
+          }
+          if (i + groupSize >= n) break;
+          int nextCount = userTaskCount.get(i + groupSize).getSecond();
+          int diff = nextCount - currentCount;
+          long cost = (long) diff * groupSize;
+          if (cost <= pool) {
+            for (int j = i; j < i + groupSize; j++) {
+              DatabaseHelper.dbNumberSet dbns = userTaskCount.get(j);
+              dbns.setSecond(dbns.getSecond() + diff);
+            }
+            pool -= (int) cost;
+            i += groupSize;
+          } else {
+            int perUser = pool / groupSize;
+            int remainder = pool % groupSize;
+            for (int j = i; j < i + groupSize; j++) {
+              DatabaseHelper.dbNumberSet dbns = userTaskCount.get(j);
+              dbns.setSecond(dbns.getSecond() + perUser);
+            }
+            int idx = i;
+            while (remainder > 0) {
+              userTaskCount.get(idx).setSecond(
+                userTaskCount.get(idx).getSecond() + 1
+              );
+              remainder--;
+              idx++;
+            }
+            pool = 0;
+            break;
+          }
+        }
+
+        if (pool > 0) {
+          int perUser = pool / n;
+          int remainder = pool % n;
+          for (DatabaseHelper.dbNumberSet dbns : userTaskCount) {
+            dbns.setSecond(dbns.getSecond() + perUser);
+          }
+          int idx = 0;
+          while (remainder > 0) {
+            userTaskCount.get(idx).setSecond(
+              userTaskCount.get(idx).getSecond() + 1
+            );
+            remainder--;
+            idx++;
+          }
+          pool = 0;
+        }
+
+        Logger.info("=== After Distribution (New Final Counts) ===");
+        userTaskCount.forEach(e ->
+          Logger.info("User " + e.getFirst() + " | count = " + e.getSecond())
+        );
+
+        // --- Allocate tasks ---
+        // Create a queue for the unassigned tasks.
+        Queue<TaskDTO> queue = new LinkedList<>(unassignedTasks);
+
+        // Build a list of tasks to update.
+        List<TaskDTO> toBeUpdatedTasks = new ArrayList<>();
+
+        // Build a map: userId -> userName (assuming userList is available)
+        Map<Integer, String> userIdToName = userList.stream()
+          .collect(Collectors.toMap(UserDTO::getId, UserDTO::getName));
+
+        // For each user, compute how many new tasks to assign.
+        for (DatabaseHelper.dbNumberSet dbns : userTaskCount) {
+          int userId = dbns.getFirst();
+          int oldCount = originalCountMap.getOrDefault(userId, 0);
+          int newCount = dbns.getSecond();
+          int toAssign = newCount - oldCount;  // new tasks for this user
+
+          if (toAssign > 0) {
+            for (int k = 0; k < toAssign; k++) {
+              if (queue.isEmpty()) {
+                break; // no more unassigned tasks
+              }
+              TaskDTO task = queue.poll();
+              // Assign the task to the user.
+              task.setUser(new UserDTO(userId, userIdToName.get(userId), household));
+              toBeUpdatedTasks.add(task);
+            }
+          }
+        }
+        Platform.runLater(() -> {
+          handleEditTask(toBeUpdatedTasks);
+        });
+        return null;
+      }
+    };
+    new Thread(task).start();
   }
 
   private void showClosedTasks(ActionEvent actionEvent) {
@@ -399,6 +553,24 @@ public class MainController {
     sortTaskStatus.setText("Status");
     resetSortActions();
   }
+  public void handleEditTask(List<TaskDTO> taskList){
+    for(TaskDTO task : taskList){
+      Message<Void> queryMessage = dataHandler.editTask(task);
+
+      if(queryMessage != null && queryMessage.getType() == MessageTypeEnum.ERROR){
+        Logger.error("(MainController.handleEditTask, handleEditTask(List<TaskDTO> taskList)) An error occurred");
+      }
+    }
+    Toast.showToast(root, new Message<Void>(MessageTypeEnum.SUCCESS, "Finished distributing tasks"), -1);
+
+    // For each newly updated task, replace the matching one in `newUIList`
+    List<TaskDTO> updatedList = new ArrayList<>(this.taskList);
+    for (TaskDTO newTask : taskList) {
+      updatedList.replaceAll(t -> (t.getId() == newTask.getId()) ? newTask : t);
+    }
+    this.taskList.setAll(updatedList); // Triggers UI refresh
+  }
+
 
   public void handleEditTask(Message<TaskDTO> message) {
     if(message.getType() == MessageTypeEnum.ERROR){
