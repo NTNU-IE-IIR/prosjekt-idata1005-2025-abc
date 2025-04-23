@@ -283,7 +283,6 @@
     -fx-padding: 14px 0 14px 4px;
     -fx-border-color: transparent transparent #F6F6F6 transparent;
     -fx-border-insets: 0 82px 0 10px;
-
 }
 .sort-order .label{
     -fx-font-family: "Inter 18pt Medium";
@@ -294,7 +293,6 @@
 
 .empty-table{
     -fx-padding: 18px;
-
 }
 
 .empty-table .label{
@@ -305,7 +303,6 @@
     -fx-border-radius:8px;
     -fx-background-radius:8px;
 }
-
 
 /* Remove focus styling from the ListView and some of its internals */
 #taskTable,
