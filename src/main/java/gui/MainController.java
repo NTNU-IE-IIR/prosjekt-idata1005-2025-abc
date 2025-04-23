@@ -50,7 +50,7 @@ public class MainController {
   @FXML private TableColumn<TaskDTO, PriorityDTO> priorityColumn;
   @FXML private TableColumn<TaskDTO, String> userColumn;
   @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, viewAllTasks, logoutButton, doneTasksBtn;
-  @FXML private TextField searchField;
+  @FXML protected TextField searchField;
   @FXML private Label userCount;
   @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
   @FXML private Region spacer;  // Reference to the first spacer
@@ -58,16 +58,16 @@ public class MainController {
   @FXML private HBox emptyTaskTable, emptyUserTable;
   @FXML private VBox populatedTaskTable, populatedUserTable;
 
-  private DataHandler dataHandler;
-  private HouseholdDTO household;
-  private ObservableList<TaskDTO> taskList;
+  protected DataHandler dataHandler;
+  protected HouseholdDTO household;
+  protected ObservableList<TaskDTO> taskList;
   private ObservableList<StatusDTO> statusList;
   private ObservableList<PriorityDTO> priorityList;
   private ObservableList<UserDTO> userList;
   private String userQuery="";
 
   // For storing the original unsorted order of tasks.
-  private List<TaskDTO> originalTaskList;
+  protected List<TaskDTO> originalTaskList;
   // Used for tracking sort clicks for each label (cycle: default -> normal -> reverse -> default).
   private final Map<Label, Integer> sortClickCounts = new HashMap<>();
 
@@ -437,7 +437,7 @@ public class MainController {
    * Handles the search action for filtering tasks based on the description.
    * @param event the action event triggered by the search field.
    */
-  private void handleSearchDescription(ActionEvent event) {
+  protected void handleSearchDescription(ActionEvent event) {
     String userQuery = searchField.getText();
     // Create a regex to simulate SQL LIKE '%query%'
     String regex = ".*" + Pattern.quote(userQuery) + ".*";

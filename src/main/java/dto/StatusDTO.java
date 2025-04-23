@@ -44,6 +44,14 @@ public class StatusDTO implements SelectOption {
     return name;
   }
 
+
+  public void setName(String name) {
+    this.name = name;
+  }
+  public void setId(int id) {
+    this.id = id;
+  }
+
   /**
    * Returns a String representation of the status.
    *

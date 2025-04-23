@@ -206,6 +206,10 @@ public class TaskDTO {
     this.user = user;
   }
 
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   @Override
   public String toString() {
     return "TaskDTO{" +
