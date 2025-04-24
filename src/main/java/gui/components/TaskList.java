@@ -27,7 +27,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-
+/**
+ * A custom JavaFX ListCell implementation for displaying and interacting with TaskDTO items.
+ * <p>
+ * Supports editing task descriptions, assigning users, changing status/priority,
+ * and displaying visual indicators based on the task's state.
+ */
 public class TaskList extends ListCell<TaskDTO> {
   @FXML private Label taskDescription, closedTaskDescription, doneDate, closedPriority, closedOwner;
   @FXML private HBox taskDescriptionContainer, closedTaskDescriptionContainer;
@@ -38,17 +43,27 @@ public class TaskList extends ListCell<TaskDTO> {
   @FXML private Button deleteTaskButton, taskDescriptionEdit;
   @FXML private ImageView closedPriorityImage;
 
+  // === Logic and state ===
   private final HouseholdDTO household;
-  private SimpleBooleanProperty isProgrammaticChange; // Guard flag
-  private TaskDTO currentTask;  // Stores the current task being modified
   private final Consumer<Message<TaskDTO>> onChange;
   private final Consumer<TaskDTO> onDelete;
+  private final UserDTO unassignedUser;
+
+  /** Prevents listener recursion during ComboBox programmatic updates */
+  private SimpleBooleanProperty isProgrammaticChange;
+
+  /** The task currently displayed in this cell */
+  private TaskDTO currentTask;
+
+  /** Custom ListCells for dropdown rendering */
   private final MyStatusListCell<StatusDTO> statusButtonCell;
   private final MyStatusListCell<PriorityDTO> priorityButtonCell;
   private final MyStatusListCell<UserDTO> ownerButtonCell;
-  private final UserDTO unassignedUser;
 
-
+  /**
+   * Custom ListCell for displaying icons in dropdowns.
+   * @param <T> a class extending SelectOption (e.g., StatusDTO, PriorityDTO)
+   */
   public class MyStatusListCell<T extends SelectOption> extends ListCell<T> {
     private final ImageView imageView = new ImageView();
 
@@ -76,14 +91,15 @@ public class TaskList extends ListCell<TaskDTO> {
       }
     }
 
-
-
+    /** Forces a refresh of the list cell */
     public void forceUpdate(T item, boolean empty) {
       updateItem(item, empty);
     }
   }
 
-
+  /**
+   * Constructor for initializing the task list cell.
+   */
   public TaskList(ObservableList<StatusDTO> statusList,
                   ObservableList<PriorityDTO> priorityList,
                   ObservableList<UserDTO> userList, HouseholdDTO household,
@@ -119,6 +135,9 @@ public class TaskList extends ListCell<TaskDTO> {
     deleteTaskButton.setOnAction(e -> onDelete.accept(currentTask));
   }
 
+  /**
+   * Loads the FXML layout and assigns this controller.
+   */
   private void loadFXML() {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/components/TaskList.fxml"));
@@ -129,6 +148,9 @@ public class TaskList extends ListCell<TaskDTO> {
     }
   }
 
+  /**
+   * Called by JavaFX when the cell needs to display a new task.
+   */
   @Override
   protected void updateItem(TaskDTO task, boolean empty) {
     super.updateItem(task, empty);
@@ -194,6 +216,9 @@ public class TaskList extends ListCell<TaskDTO> {
     }
   }
 
+  /**
+   * Displays UI for a closed (done) task.
+   */
   private void displayClosedTasks(TaskDTO task){
     closedTaskDescription.setText(task.getDescription());
     doneDate.setText(task.getDoneDate().toString());
@@ -211,6 +236,9 @@ public class TaskList extends ListCell<TaskDTO> {
     }
   }
 
+  /**
+   * Returns the background colors for dropdowns based on status/priority values.
+   */
   private String[] comboBoxPaint(TaskDTO task) {
     String[] styles = new String[3];
     switch (task.getStatus().getId()){
@@ -245,6 +273,9 @@ public class TaskList extends ListCell<TaskDTO> {
     return styles;
   }
 
+  /**
+   * Generates an icon for the given SelectOption based on its type and ID.
+   */
   private Image createIcon(SelectOption item) throws FileNotFoundException {
     // Build iconPath depending on runtime type
     String iconPath = "/icons";
@@ -296,6 +327,9 @@ public class TaskList extends ListCell<TaskDTO> {
     return new Image(resourceUrl.toExternalForm());
   }
 
+  /**
+   * Sets up and handles task description editing.
+   */
   private void setupDescriptionEdit(ActionEvent actionEvent) {
     String oldDescription = currentTask.getDescription();
 
@@ -312,6 +346,9 @@ public class TaskList extends ListCell<TaskDTO> {
     });
   }
 
+  /**
+   * Handles updates to status, priority, or owner dropdowns.
+   */
   private void taskUpdate(ObservableValue<? extends SelectOption> observable, SelectOption  oldValue, SelectOption  newValue){
     if (isProgrammaticChange.getValue()) return;
     if(newValue == null) {

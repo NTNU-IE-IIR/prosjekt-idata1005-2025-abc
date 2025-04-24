@@ -11,6 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Handles all data access and manipulation logic related to households, users, tasks,
+ * statuses, and priorities.
+ * <p>
+ * This class acts as a middle layer between the application logic and the database,
+ * encapsulating all SQL queries and delegating database operations to {@link DatabaseHelper}.
+ */
 public class DataHandler {
     private static final DatabaseHelper dbHelper;
     private static final String url = "jdbc:mysql://mysql.stud.ntnu.no:3306/thomabol_homedatabase?allowPublicKeyRetrieval=true&useSSL=false";
@@ -21,17 +28,13 @@ public class DataHandler {
         dbHelper = new DatabaseHelper(url, user, password);
     }
 
-    public List<HouseholdDTO> getAllHouseholds() {
-        List<HouseholdDTO> households = new ArrayList<>();
-        String query = "SELECT id, name FROM households";
-        try {
-            households = dbHelper.executeSelect(query, HouseholdDTO.class);
-        } catch (SQLException e) {
-            Logger.error("Error fetching households: " + e.getMessage());
-        }
-        return households;
-    }
-
+    /**
+     * Retrieves a household based on its name and hashed password.
+     *
+     * @param name the name of the household
+     * @param hashedPassword the hashed password
+     * @return a Message containing the household or an error
+     */
     public Message<HouseholdDTO> getHousehold(String name, String hashedPassword) {
         String query = "SELECT id, name FROM households WHERE name=? AND password=? LIMIT 1";
         Message<HouseholdDTO> message;
@@ -49,6 +52,11 @@ public class DataHandler {
         return message;
     }
 
+    /**
+     * Retrieves all status entries (with IDs between 1 and 3) from the database.
+     *
+     * @return a list of StatusDTO objects
+     */
     public List<StatusDTO> getAllStatus() {
         List<StatusDTO> status = new ArrayList<>();
         String query = "SELECT id, name FROM status WHERE id BETWEEN 1 AND 3";
@@ -60,6 +68,11 @@ public class DataHandler {
         return status;
     }
 
+    /**
+     * Retrieves all priority entries from the database.
+     *
+     * @return a list of PriorityDTO objects
+     */
     public List<PriorityDTO> getAllPriorities() {
         List<PriorityDTO> priorities = new ArrayList<>();
         String query = "SELECT id, name FROM priorities";
@@ -71,16 +84,12 @@ public class DataHandler {
         return priorities;
     }
 
-    public int getHouseholdId(String householdName) {
-        String query = "SELECT id FROM households WHERE name = ?";
-        try {
-            return dbHelper.executeSelect(query, Integer.class).getFirst();
-        } catch (SQLException e) {
-            Logger.error("Error getting household ID: " + e.getMessage());
-        }
-        return -1;
-    }
-
+    /**
+     * Adds a new task to the database.
+     *
+     * @param task the TaskDTO to add
+     * @return a Message containing the ID of the new task or an error
+     */
     public Message<Integer> addTask(TaskDTO task) {
         Message<Integer> message;
         String query = "INSERT INTO tasks (householdId, description, statusId, priorityId, ownerId) " +
@@ -104,6 +113,12 @@ public class DataHandler {
         return message;
     }
 
+    /**
+     * Retrieves all users belonging to a specific household.
+     *
+     * @param householdId the ID of the household
+     * @return a list of UserDTO objects
+     */
     public List<UserDTO> getAllUsersByHousehold(int householdId) {
         List<UserDTO> users = new ArrayList<>();
         String query =
@@ -118,6 +133,12 @@ public class DataHandler {
         return users;
     }
 
+    /**
+     * Retrieves all active tasks (status ID 1 to 3) for a specific household.
+     *
+     * @param householdId the ID of the household
+     * @return a list of TaskDTO objects
+     */
     public List<TaskDTO> getAllTasksByHouseHold(int householdId) {
         List<TaskDTO> tasks = new ArrayList<>();
         String query = "SELECT " +
@@ -141,30 +162,12 @@ public class DataHandler {
         return tasks;
     }
 
-    public List<TaskDTO> getAllTasksByHouseHold(int householdId, String userQuery) {
-        List<TaskDTO> tasks = new ArrayList<>();
-        userQuery = "%" + userQuery + "%"; // <- Enables "like" searching.
-        String query = "SELECT " +
-                "t.id, t.description, " +
-                "h.id AS household_id, h.name AS household_name, " +
-                "s.id AS status_id, s.name AS status_name, " +
-                "p.id AS priority_id, p.name AS priority_name, " +
-                "u.id AS user_id, u.name AS user_name " +
-                "FROM tasks t " +
-                "LEFT JOIN households h ON t.householdId = h.id " +
-                "LEFT JOIN status s ON t.statusId = s.id " +
-                "LEFT JOIN priorities p ON t.priorityId = p.id " +
-                "LEFT JOIN users u ON t.ownerId = u.id " +
-                "WHERE t.householdId = ? AND t.description LIKE ? AND t.statusId BETWEEN 1 AND 3 " +
-                "ORDER BY t.id DESC";
-        try {
-            tasks = dbHelper.executeSelect(query, TaskDTO.class, householdId, userQuery);
-        } catch (SQLException e) {
-            Logger.error("Error fetching tasks: " + e.getMessage());
-        }
-        return tasks;
-    }
-
+    /**
+     * Adds a new user to the database.
+     *
+     * @param user the UserDTO to add
+     * @return a Message containing the new user's ID or an error
+     */
     public Message<Integer> addUser(UserDTO user) {
         String query = "INSERT INTO users (name, householdId) VALUES (?, ?)";
         Message<Integer> message;
@@ -185,7 +188,11 @@ public class DataHandler {
         return message;
     }
 
-    //TODO
+    /**
+     * Deletes a user from the database and unassigns them from all tasks.
+     *
+     * @param user the UserDTO to delete
+     */
     public void deleteUser(UserDTO user) {
         String query = "DELETE FROM users WHERE id = ?";
         String queryUnassignUser = "UPDATE tasks SET ownerId = NULL WHERE ownerId = ?";
@@ -207,6 +214,12 @@ public class DataHandler {
         }
     }
 
+    /**
+     * Retrieves all active tasks (status ID 1 to 3) assigned to a specific user.
+     *
+     * @param user the user whose tasks to retrieve
+     * @return a Message containing the user's tasks or an error
+     */
     public Message<List<TaskDTO>> getUserTasks(UserDTO user) {
         Message<List<TaskDTO>> message;
         String query ="SELECT " +
@@ -232,6 +245,12 @@ public class DataHandler {
         return message;
     }
 
+    /**
+     * Updates the name of an existing user.
+     *
+     * @param selectedUser the user with updated data
+     * @return a Message indicating success or failure
+     */
     public Message<Void> editUser(UserDTO selectedUser) {
         Message<Void> message;
         String query = "UPDATE users SET name = ? WHERE id = ?";
@@ -250,6 +269,12 @@ public class DataHandler {
         return message;
     }
 
+    /**
+     * Deletes a task from the database based on its ID.
+     *
+     * @param task the TaskDTO to delete
+     * @return a Message indicating success or failure
+     */
     public Message<Void> deleteTask(TaskDTO task) {
         Message<Void> message;
         String query = "DELETE FROM tasks WHERE id = ?";
@@ -268,7 +293,12 @@ public class DataHandler {
         }
         return message;
     }
-
+    /**
+     * Edits an existing task with new data.
+     *
+     * @param editedTask the task with updated fields
+     * @return a Message indicating success or failure
+     */
     public Message<Void> editTask(TaskDTO editedTask) {
         Message<Void> message = null;
         String query = "UPDATE tasks SET description = ?, statusId = ?, priorityId = ?, ownerId = ? WHERE id = ?";
@@ -292,6 +322,12 @@ public class DataHandler {
         return message;
     }
 
+    /**
+     * Closes a task by updating its status to 4 and setting the done date.
+     *
+     * @param doneTasks the task to close
+     * @return a Message indicating success or failure
+     */
     public Message<Void> closeDoneTasks(TaskDTO doneTasks) {
         Message<Void> message = new Message<>(MessageTypeEnum.SUCCESS, "Successfully closed task");
         String query = "UPDATE tasks SET statusId = 4, doneDate = ? WHERE id = ?";
@@ -310,6 +346,13 @@ public class DataHandler {
         }
         return message;
     }
+
+    /**
+     * Retrieves all closed tasks (status ID 4) for a given household.
+     *
+     * @param householdId the ID of the household
+     * @return a list of closed TaskDTO objects
+     */
     public List<TaskDTO> getClosedTasks(int householdId) {
         List<TaskDTO> tasks = new ArrayList<>();
         Message<Void> message = null;
@@ -337,7 +380,12 @@ public class DataHandler {
         return tasks;
     }
 
-
+    /**
+     * Retrieves the number of active (non-closed) tasks assigned to each user in a household.
+     *
+     * @param householdId the ID of the household
+     * @return a Message containing a list of dbNumberSet (user ID and task count) or an error
+     */
     public Message<List<DatabaseHelper.dbNumberSet>> getActiveTaskPerUser(int householdId) {
         Message<List<DatabaseHelper.dbNumberSet>> message = null;
         String query = "SELECT u.id as first, COUNT(t.id) as second FROM users u " +
@@ -358,7 +406,4 @@ public class DataHandler {
         }
         return message;
     }
-
-
-
 }

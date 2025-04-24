@@ -10,22 +10,36 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides utility methods for interacting with a relational database using JDBC.
+ * <p>
+ * Supports execution of parameterized queries, mapping result sets to DTO objects,
+ * and managing generated keys and nested DTOs.
+ */
 public class DatabaseHelper {
 
+  /**
+   * A helper class used to return a pair of numbers from a database operation.
+   * Typically used for tracking rows affected and an auto-generated ID.
+   */
   public static class dbNumberSet {
     private int first;
     private long second;
 
-    // Default no-argument constructor
+    /** Default no-argument constructor. */
     public dbNumberSet() { }
 
-    // Parameterized constructor
+    /**
+     * Constructs a dbNumberSet with specified values.
+     *
+     * @param first  the first integer (e.g., rows affected)
+     * @param second the second number (e.g., generated ID)
+     */
     public dbNumberSet(int first, long second) {
       this.first = first;
       this.second = second;
     }
 
-    // Getters and setters
     public int getFirst() {
       return first;
     }
@@ -43,11 +57,17 @@ public class DatabaseHelper {
     }
   }
 
-
   private final String url;
   private final String user;
   private final String password;
 
+  /**
+   * Constructs a DatabaseHelper with the specified database credentials.
+   *
+   * @param url      the JDBC URL
+   * @param user     the database username
+   * @param password the database password
+   */
   public DatabaseHelper(String url, String user, String password) {
     this.url = url;
     this.user = user;
