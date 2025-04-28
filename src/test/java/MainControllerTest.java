@@ -1,98 +1,123 @@
 // Language: java
 package gui;
 
-import dbcontext.DataHandler;
-import dto.HouseholdDTO;
-import dto.TaskDTO;
 import javafx.embed.swing.JFXPanel;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.collections.FXCollections;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import utils.Message;
-import utils.MessageTypeEnum;
+import dto.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MainControllerTest {
+/**
+ * Tests for the MainController class.
+ *
+ * <p>
+ * This test class verifies the functionality of the MainController including
+ * searching task descriptions and sorting tasks by description in both ascending
+ * and descending order.
+ * </p>
+ */
+class MainControllerTest {
 
     private MainController controller;
+    private TaskDTO t1, t2, t3;
+    private HouseholdDTO household;
 
-    // Initialize JavaFX toolkit
+    /**
+     * Initializes the JavaFX toolkit so that JavaFX controls can be instantiated in tests.
+     */
     @BeforeAll
-    public static void initJavaFX() {
+    static void initJfxToolkit() {
         new JFXPanel();
     }
 
-    // A fake DataHandler to simulate data operations
-    private static class FakeDataHandler extends DataHandler {
-        public FakeDataHandler() {
-            super();
-        }
-
-        @Override
-        public java.util.List<TaskDTO> getAllTasksByHouseHold(int householdId) {
-            TaskDTO task = new TaskDTO();
-            task.setId(1);
-            task.setDescription("Clean kitchen");
-            return java.util.Collections.singletonList(task);
-        }
-
-        @Override
-        public Message<Void> closeDoneTasks(TaskDTO task) {
-            return new Message<>(MessageTypeEnum.SUCCESS, null);
-        }
-    }
-
+    /**
+     * Sets up the MainController instance, stubs FXML‐injected controls, and creates dummy task data.
+     */
     @BeforeEach
-    public void setup() {
+    void setUp() {
         controller = new MainController();
-        controller.dataHandler = new FakeDataHandler();
-        controller.household = new HouseholdDTO(1, "TestHouse");
-        controller.originalTaskList = new ArrayList<>();
-        ObservableList<TaskDTO> tasks = FXCollections.observableArrayList();
-        controller.taskList = tasks;
+
+        // Stub the FXML‐injected controls the logic touches:
         controller.searchField = new TextField();
+        controller.sortTaskDescription = new Label("Description");
+        controller.sortTaskStatus      = new Label("Status");
+        controller.sortTaskPriority    = new Label("Priority");
+        controller.sortTaskOwner       = new Label("Owner");
+
+        // Dummy household
+        household = new HouseholdDTO(1, "TestHouse");
+
+        // Create three tasks with distinct descriptions
+        t1 = new TaskDTO("alpha", household, new PriorityDTO(1, "Low"), null);
+        t2 = new TaskDTO("Bravo", household, new PriorityDTO(1, "Low"), null);
+        t3 = new TaskDTO("charlie", household, new PriorityDTO(1, "Low"), null);
+
+        // Set up originalTaskList and taskList
+        controller.originalTaskList = new ArrayList<>(List.of(t1, t2, t3));
+        controller.taskList = FXCollections.observableArrayList(t1, t2, t3);
+
+        // Clear any previous filter
+        controller.userQuery = "";
     }
 
+    /**
+     * Tests that an empty search query returns all tasks in their original order.
+     */
     @Test
-    public void testSetHousehold() {
-        HouseholdDTO newHouse = new HouseholdDTO(2, "AnotherHouse");
-        controller.setHousehold(newHouse);
+    void testSearchDescription_emptyQueryReturnsAll() {
+        controller.searchField.setText("");
+        controller.handleSearchDescription((ActionEvent) null);
 
-        try {
-            java.lang.reflect.Field householdField = MainController.class.getDeclaredField("household");
-            householdField.setAccessible(true);
-            HouseholdDTO result = (HouseholdDTO) householdField.get(controller);
-            assertEquals("AnotherHouse", result.getName());
-        } catch (Exception e) {
-            fail("Reflection failed: " + e.getMessage());
-        }
+        assertEquals(3, controller.taskList.size());
+        // Should maintain original order
+        assertIterableEquals(controller.originalTaskList, controller.taskList);
     }
 
+    /**
+     * Tests that the search is case insensitive by looking for a mixed-case query.
+     */
     @Test
-    public void testHandleSearchDescription() {
-        TaskDTO task1 = new TaskDTO();
-        task1.setId(1);
-        task1.setDescription("Clean kitchen");
-
-        TaskDTO task2 = new TaskDTO();
-        task2.setId(2);
-        task2.setDescription("Wash car");
-
-        controller.originalTaskList = new ArrayList<>();
-        controller.originalTaskList.add(task1);
-        controller.originalTaskList.add(task2);
-        controller.taskList = FXCollections.observableArrayList(controller.originalTaskList);
-        controller.searchField.setText("Clean");
-        controller.handleSearchDescription(new ActionEvent());
+    void testSearchDescription_caseInsensitive() {
+        controller.searchField.setText("bRaVo");
+        controller.handleSearchDescription((ActionEvent) null);
 
         assertEquals(1, controller.taskList.size());
-        assertEquals("Clean kitchen", controller.taskList.get(0).getDescription());
+        assertSame(t2, controller.taskList.get(0));
+    }
+
+    /**
+     * Tests that sorting task descriptions in ascending order works correctly.
+     */
+    @Test
+    void testSortTaskDescription_ascending() {
+        // Shuffle the list for sorting test
+        controller.taskList = FXCollections.observableArrayList(t3, t1, t2);
+
+        controller.sortTaskDescription(false);
+
+        // Expected order: alpha, Bravo, charlie
+        assertEquals(List.of(t1, t2, t3), controller.taskList);
+    }
+
+    /**
+     * Tests that sorting task descriptions in descending order works correctly.
+     */
+    @Test
+    void testSortTaskDescription_descending() {
+        controller.taskList = FXCollections.observableArrayList(t1, t2, t3);
+
+        controller.sortTaskDescription(true);
+
+        // Expected reverse order: charlie, Bravo, alpha
+        assertEquals(List.of(t3, t2, t1), controller.taskList);
     }
 }

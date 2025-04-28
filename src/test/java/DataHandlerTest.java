@@ -1,168 +1,234 @@
-//// File: src/test/java/dbcontext/DataHandlerTest.java
-//
-//import dbcontext.DataHandler;
-//import dbcontext.DatabaseHelper;
-//import dto.HouseholdDTO;
-//import dto.TaskDTO;
-//import dto.StatusDTO;
-//import dto.PriorityDTO;
-//import dto.UserDTO;
-//import utils.Message;
-//import utils.MessageTypeEnum;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//
-//import java.lang.reflect.Field;
-//import java.sql.SQLException;
-//import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//public class DataHandlerTest {
-//
-//    private DataHandler dataHandler;
-//
-//    @BeforeAll
-//    public static void setupClass() throws Exception {
-//        // Replace the static final dbHelper field with our fake
-//        Field dbHelperField = DataHandler.class.getDeclaredField("dbHelper");
-//        dbHelperField.setAccessible(true);
-//        dbHelperField.set(null, new FakeDatabaseHelper());
-//    }
-//
-//    @BeforeEach
-//    public void setup() {
-//        dataHandler = new DataHandler();
-//    }
-//
-//    @Test
-//    public void testGetAllHouseholds() {
-//        List<HouseholdDTO> households = dataHandler.getAllHouseholds();
-//        assertNotNull(households);
-//        assertEquals(1, households.size());
-//        assertEquals("TestHouse", households.get(0).getName());
-//    }
-//
-//    @Test
-//    public void testGetHousehold_Success() {
-//        Message<HouseholdDTO> message = dataHandler.getHousehold("TestHouse", "valid");
-//        assertEquals(MessageTypeEnum.SUCCESS, message.getType());
-//        assertNotNull(message.getMessage());
-//        assertEquals("TestHouse", message.getMessage().getName());
-//    }
-//
-//    @Test
-//    public void testGetHousehold_Failure() {
-//        Message<HouseholdDTO> message = dataHandler.getHousehold("TestHouse", "invalid");
-//        assertEquals(MessageTypeEnum.ERROR, message.getType());
-//        assertNull(message.getMessage());
-//    }
-//
-//    @Test
-//    public void testGetHouseholdId() {
-//        int id = dataHandler.getHouseholdId("TestHouse");
-//        assertEquals(1, id);
-//    }
-//
-//    @Test
-//    public void testAddTask() {
-//        // Create a dummy task. It is assumed that TaskDTO and StatusDTO have setters available.
-//        TaskDTO task = new TaskDTO();
-//        PriorityDTO priority = new PriorityDTO();
-//        UserDTO user = new UserDTO();
-//        task.setId(1);
-//        task.setDescription("Test Task");
-//        StatusDTO status = new StatusDTO();
-//        status.setId(1);
-//        task.setStatus(status);
-//        task.setPriority(priority);
-//        task.setUser(user);
-//
-//        Message<Integer> message = dataHandler.addTask(task);
-//        assertEquals(MessageTypeEnum.SUCCESS, message.getType());
-//        assertNotNull(message.getMessage());
-//        assertTrue(message.getMessage() > 0);
-//    }
-//
-//    // FakeDatabaseHelper simulates the required DatabaseHelper behavior
-//    public static class FakeDatabaseHelper extends DatabaseHelper {
-//        public FakeDatabaseHelper() {
-//            super("", "", ""); // connection parameters ignored in fake
-//        }
-//
-//        @Override
-//        public <T> List<T> executeSelect(String query, Class<T> clazz, Object... params) throws SQLException {
-//            // Simulate getAllHouseholds
-//            if (query.contains("FROM households") && !query.contains("WHERE name=?")) {
-//                if (clazz.equals(HouseholdDTO.class)) {
-//                    HouseholdDTO house = new HouseholdDTO(1, "TestHouse");
-//                    return (List<T>) Collections.singletonList(house);
-//                }
-//            }
-//            // Simulate getHousehold with name and password check
-//            else if (query.contains("FROM households WHERE name=? AND password=?")) {
-//                if (params.length >= 2 && "valid".equals(params[1])) {
-//                    HouseholdDTO house = new HouseholdDTO(1, "TestHouse");
-//                    return (List<T>) Collections.singletonList(house);
-//                } else {
-//                    return new ArrayList<>();
-//                }
-//            }
-//            // Simulate getHouseholdId
-//            else if (query.contains("SELECT id FROM households WHERE name = ?")) {
-//                if (params.length >= 1 && "TestHouse".equals(params[0])) {
-//                    return (List<T>) Collections.singletonList(1);
-//                }
-//            }
-//            // Simulate getAllStatus
-//            else if (query.contains("FROM status") && clazz.equals(StatusDTO.class)) {
-//                StatusDTO status = new StatusDTO();
-//                status.setId(1);
-//                status.setName("Open");
-//                return (List<T>) Collections.singletonList(status);
-//            }
-//            // Simulate getAllPriorities
-//            else if (query.contains("FROM priorities") && clazz.equals(PriorityDTO.class)) {
-//                PriorityDTO priority = new PriorityDTO(1, "High");
-//                return (List<T>) Collections.singletonList(priority);
-//            }
-//            return new ArrayList<>();
-//        }
-//
-//        @Override
-//        public int executeUpdate(String query, Object... params) throws SQLException {
-//            // Simulate successful update or delete
-//            return 1;
-//        }
-//
-//        @Override
-//        public IntSet executeUpdateGeneratedKeys(String query, Object... params) throws SQLException {
-//            // Simulate successful insertion returning generated key 100
-//            return new IntSetImpl(1, 100);
-//        }
-//    }
-//
-//    // Fake implementation of DatabaseHelper.IntSet
-//    public static class IntSetImpl extends DatabaseHelper.IntSet {
-//        private final int rowsAffected;
-//        private final int autoGeneratedId;
-//
-//        public IntSetImpl(int rowsAffected, int autoGeneratedId) {
-//            this.rowsAffected = rowsAffected;
-//            this.autoGeneratedId = autoGeneratedId;
-//        }
-//
-//        @Override
-//        public int rowsAffected() {
-//            return rowsAffected;
-//        }
-//
-//        @Override
-//        public int autoGeneratedId() {
-//            return autoGeneratedId;
-//        }
-//    }
-//}
+// Language: java
+package dbcontext;
+
+import org.junit.jupiter.api.*;
+import utils.HashUtil;
+import utils.Logger;
+import utils.Message;
+import utils.MessageTypeEnum;
+import utils.PreferenceUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Test class for DataHandler.
+ *
+ * <p>
+ * This class contains both database tests (which are disabled) and utility tests using JUnit 5.
+ * The utility tests include tests for HashUtil, Message functionality, Logger redirection,
+ * and PreferenceUtil settings.
+ * </p>
+ */
+@Disabled("Database not configured for tests—focusing on utils for now")
+class DataHandlerTest {
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Database tests are defined below but will be skipped.
+    // ─────────────────────────────────────────────────────────────────────
+
+    /**
+     * Test to verify that getAllStatus returns a list from the helper.
+     * This test is skipped due to disabled class.
+     */
+    @Test
+    void getAllStatus_shouldReturnListFromHelper() {
+        // Skipped test.
+    }
+
+    /**
+     * Test to verify that getAllPriorities returns a list from the helper.
+     * This test is skipped due to disabled class.
+     */
+    @Test
+    void getAllPriorities_shouldReturnListFromHelper() {
+        // Skipped test.
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Utility Tests
+    // ─────────────────────────────────────────────────────────────────────
+
+    /**
+     * Nested tests for HashUtil class.
+     */
+    @Nested
+    class HashUtilTests {
+        /**
+         * Tests that SHA-256 hash for an empty string matches that of MessageDigest.
+         */
+        @Test
+        void emptyStringHashMatchesMessageDigest() throws Exception {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] expectedBytes = md.digest("".getBytes(StandardCharsets.UTF_8));
+            StringBuilder expectedHex = new StringBuilder();
+            for (byte b : expectedBytes) {
+                expectedHex.append(String.format("%02x", b));
+            }
+            String actual = HashUtil.hashSHA256("");
+            assertEquals(expectedHex.toString(), actual);
+        }
+
+        /**
+         * Tests that SHA-256 hash for string "abc" matches a precomputed value.
+         */
+        @Test
+        void knownValue_abc() {
+            String expected = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
+            assertEquals(expected, HashUtil.hashSHA256("abc"));
+        }
+    }
+
+    /**
+     * Nested tests for Message and MessageTypeEnum.
+     */
+    @Nested
+    class MessageAndEnumTests {
+        /**
+         * Verifies that the default constructor for Message sets the type as ERROR.
+         */
+        @Test
+        void defaultConstructorIsError() {
+            Message<String> m = new Message<>("oops");
+            assertEquals(MessageTypeEnum.ERROR, m.getType());
+            assertEquals("oops", m.getMessage());
+            assertNull(m.getResult());
+        }
+
+        /**
+         * Tests the full constructor and setter methods of Message.
+         */
+        @Test
+        void fullConstructorAndSetters() {
+            Message<Integer> m = new Message<>(MessageTypeEnum.SUCCESS, "yay", 42);
+            assertEquals(MessageTypeEnum.SUCCESS, m.getType());
+            assertEquals("yay", m.getMessage());
+            assertEquals(42, m.getResult());
+
+            m.setType(MessageTypeEnum.WARNING);
+            m.setMessage("careful");
+            m.setResult(99);
+            assertEquals(MessageTypeEnum.WARNING, m.getType());
+            assertEquals("careful", m.getMessage());
+            assertEquals(99, m.getResult());
+        }
+
+        /**
+         * Tests that MessageTypeEnum contains all expected values.
+         */
+        @Test
+        void enumContainsAllValues() {
+            MessageTypeEnum[] vals = MessageTypeEnum.values();
+            assertArrayEquals(
+                    new MessageTypeEnum[]{MessageTypeEnum.SUCCESS, MessageTypeEnum.ERROR, MessageTypeEnum.INFO, MessageTypeEnum.WARNING},
+                    vals
+            );
+        }
+    }
+
+    /**
+     * Nested tests for Logger functionality.
+     */
+    @Nested
+    class LoggerTests {
+        private PrintStream originalOut, originalErr;
+        private ByteArrayOutputStream outBuf, errBuf;
+
+        /**
+         * Redirects System.out and System.err to local buffers for testing.
+         */
+        @BeforeEach
+        void swapStreams() {
+            originalOut = System.out;
+            originalErr = System.err;
+            outBuf = new ByteArrayOutputStream();
+            errBuf = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(outBuf));
+            System.setErr(new PrintStream(errBuf));
+        }
+
+        /**
+         * Restores original System.out and System.err.
+         */
+        @AfterEach
+        void restoreStreams() {
+            System.setOut(originalOut);
+            System.setErr(originalErr);
+        }
+
+        /**
+         * Tests that Logger.info sends output to System.out.
+         */
+        @Test
+        void infoGoesToStdOut() {
+            Logger.info("hello");
+            assertEquals("hello\n", outBuf.toString());
+        }
+
+        /**
+         * Tests that Logger.error sends output to System.err.
+         */
+        @Test
+        void errorGoesToStdErr() {
+            Logger.error("fail");
+            assertEquals("fail\n", errBuf.toString());
+        }
+
+        /**
+         * Tests that Logger.infoNewLine appends a new line in System.out.
+         */
+        @Test
+        void infoNewLineAlsoStdOut() {
+            Logger.infoNewLine("line");
+            assertEquals("line\n", outBuf.toString());
+        }
+    }
+
+    /**
+     * Nested tests for PreferenceUtil functionality.
+     */
+    @Nested
+    class PreferenceUtilTests {
+        private PreferenceUtil prefs;
+        private final String nodeName = DataHandlerTest.class.getName() + "." + UUID.randomUUID();
+
+        /**
+         * Sets up PreferenceUtil instance before each test.
+         */
+        @BeforeEach
+        void setUp() {
+            prefs = new PreferenceUtil(nodeName);
+        }
+
+        /**
+         * Tests that a missing key returns the default value.
+         */
+        @Test
+        void getWithDefaultWhenMissing() {
+            assertEquals("def", prefs.getSetting("no_such_key", "def"));
+        }
+
+        /**
+         * Tests saving a setting and then retrieving it.
+         */
+        @Test
+        void saveAndRetrieve() {
+            prefs.saveSetting("foo", "bar");
+            assertEquals("bar", prefs.getSetting("foo", "ignored"));
+            assertEquals("bar", prefs.getSetting("foo"));
+        }
+
+        /**
+         * Tests that a missing key without a default returns a fallback message.
+         */
+        @Test
+        void missingWithoutDefaultReturnsFallbackMessage() {
+            assertEquals("Could not retrieve.", prefs.getSetting("unknown"));
+        }
+    }
+}

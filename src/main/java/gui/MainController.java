@@ -54,7 +54,14 @@ public class MainController {
   @FXML private Button addTaskBtn, distributeBtn, closeDoneBtn, addUserBtn, viewAllTasks, logoutButton, doneTasksBtn;
   @FXML protected TextField searchField;
   @FXML private Label userCount;
-  @FXML private Label sortTaskDescription, sortTaskStatus, sortTaskPriority, sortTaskOwner;
+  @FXML
+  protected Label sortTaskDescription;
+    @FXML
+    protected Label sortTaskStatus;
+    @FXML
+    protected Label sortTaskPriority;
+    @FXML
+    protected Label sortTaskOwner;
   @FXML private Region spacer;  // Reference to the first spacer
   @FXML private Region spacer2; // Reference to the second spacer
   @FXML private HBox emptyTaskTable, emptyUserTable;
@@ -66,7 +73,7 @@ public class MainController {
   private ObservableList<StatusDTO> statusList;
   private ObservableList<PriorityDTO> priorityList;
   private ObservableList<UserDTO> userList;
-  private String userQuery="";
+  protected String userQuery="";
 
   // For storing the original unsorted order of tasks.
   protected List<TaskDTO> originalTaskList;
@@ -475,7 +482,7 @@ public class MainController {
     );
   }
 
-  private void sortTaskDescription(boolean reverse) {
+  protected void sortTaskDescription(boolean reverse) {
     sortTaskList(
       TaskDTO::getDescription,
       String.CASE_INSENSITIVE_ORDER,
