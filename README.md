@@ -19,3 +19,12 @@ To run the application, you need to use Maven. You can follow one of these metho
 2. Run the following command:
    ```bash
    mvn javafx:run
+
+
+### Users and password for the application
+Fresh household:   
+   Username: mvp
+   password: 123
+Household with users and tasks:
+   Username: House2
+   password: 123
