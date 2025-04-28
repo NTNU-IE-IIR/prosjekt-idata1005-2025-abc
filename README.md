@@ -21,10 +21,16 @@ To run the application, you need to use Maven. You can follow one of these metho
    mvn javafx:run
 
 
-### Users and password for the application
-Fresh household:   
-   Username: mvp
-   password: 123
+## Users and Passwords for the Application
+
+Fresh household:
+```bash
+Username: mvp
+Password: 123
+```
+
 Household with users and tasks:
-   Username: House2
-   password: 123
+```bash
+Username: House2
+Password: 123
+```
