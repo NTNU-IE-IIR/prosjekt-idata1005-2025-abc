@@ -34,3 +34,5 @@ Household with users and tasks:
 Username: House2
 Password: 123
 ```
+### How to view the JavaDoc
+   After the user has pulled or downloaded the project, the JavaDoc files are in the JavaDoc H.O.M.E. When you go into the folder you can find a file called index.html. You can right click the file and chose the option open with.       When chosing a option you choose the default browser of your system. You then get a new window open where you can navigate through the JavaDoc of the H.O.M.E project. 
